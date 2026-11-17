@@ -73,73 +73,54 @@
 </header>
 
 <main id="top">
-  <!-- 2. Hero mit Suche -->
+  <!-- Suche und Steuerung -->
   <section class="glow">
-    <div class="mx-auto max-w-5xl px-5 pb-10 pt-12 sm:pt-16">
-      <span class="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-600">
-        <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span></span>
-        Live Kurse
-      </span>
-      <h1 class="mt-5 max-w-2xl text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl">Alle wichtigen Kurse auf einen Blick</h1>
-      <p class="mt-4 max-w-xl text-lg text-slate-600">Aktien, Indizes und Kryptowährungen in einer schlichten Übersicht. Titel suchen, merken und jederzeit neu laden.</p>
-
-      <div class="relative mt-8 max-w-xl">
+    <div class="mx-auto max-w-5xl px-5 pb-6 pt-6 sm:pt-8">
+      <div class="relative max-w-xl">
         <label for="q" class="sr-only">Aktie oder Kryptowährung suchen</label>
         <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 shadow-sm transition focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-100">
           <i data-lucide="search" class="h-5 w-5 shrink-0 text-slate-400"></i>
-          <input id="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Apple, Nestlé, Bitcoin ..." class="h-14 w-full bg-transparent text-base outline-none placeholder:text-slate-400">
+          <input id="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Suchen" class="h-12 w-full bg-transparent text-base outline-none placeholder:text-slate-400">
         </div>
         <div id="results" class="absolute left-0 right-0 z-30 mt-2 hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10"></div>
       </div>
-
-      <div class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-        <button type="button" class="js-refresh inline-flex h-11 items-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-bold text-white transition hover:bg-slate-800 active:scale-95 disabled:opacity-70">
-          <i data-lucide="refresh-cw" class="h-4 w-4"></i>Jetzt aktualisieren
+      <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3">
+        <button type="button" class="js-refresh inline-flex h-10 items-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-bold text-white transition hover:bg-slate-800 active:scale-95 disabled:opacity-70">
+          <i data-lucide="refresh-cw" class="h-4 w-4"></i>Aktualisieren
         </button>
         <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm font-medium text-slate-600">
           <input id="auto" type="checkbox" class="peer sr-only">
           <span class="relative h-5 w-9 rounded-full bg-slate-300 transition after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition after:content-[''] peer-checked:bg-indigo-600 peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-400 peer-focus-visible:ring-offset-2"></span>
-          Automatisch alle 60 Sekunden
+          Auto
         </label>
-        <span id="stamp" class="text-sm text-slate-500" aria-live="polite">Wird geladen ...</span>
+        <span id="stamp" class="text-sm tabular-nums text-slate-500" aria-live="polite"></span>
       </div>
-
-      <div id="notice" class="mt-5 hidden max-w-xl rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="status"></div>
+      <div id="notice" class="mt-4 hidden max-w-xl rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="status"></div>
     </div>
   </section>
 
   <!-- 3. Märkte -->
   <section id="maerkte" class="mx-auto max-w-5xl px-5 pb-12">
     <h2 class="text-xl font-extrabold tracking-tight">Märkte</h2>
-    <p class="mt-1 text-sm text-slate-500">Wichtige Indizes, Veränderung zum Vortag</p>
     <div id="indices" class="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4"></div>
   </section>
 
   <!-- 4. Watchlist -->
   <section id="watchlist" class="mx-auto max-w-5xl px-5 pb-12">
-    <div class="flex items-end justify-between gap-4">
-      <div>
-        <h2 class="text-xl font-extrabold tracking-tight">Meine Watchlist</h2>
-        <p class="mt-1 text-sm text-slate-500">Bleibt in diesem Browser gespeichert</p>
-      </div>
-    </div>
+    <h2 class="text-xl font-extrabold tracking-tight">Watchlist</h2>
     <div id="watchBox" class="mt-5 overflow-hidden rounded-3xl border border-slate-200/80 bg-white"></div>
   </section>
 
   <!-- 5. Aktien -->
   <section id="aktien" class="mx-auto max-w-5xl px-5 pb-12">
     <h2 class="text-xl font-extrabold tracking-tight">Aktien</h2>
-    <p class="mt-1 text-sm text-slate-500">Grosse Titel aus den USA und der Schweiz, Verlauf der letzten 30 Tage</p>
     <div id="stockBox" class="mt-5 overflow-hidden rounded-3xl border border-slate-200/80 bg-white"></div>
   </section>
 
   <!-- 6. Krypto -->
   <section id="krypto" class="mx-auto max-w-5xl px-5 pb-16">
     <div class="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h2 class="text-xl font-extrabold tracking-tight">Kryptowährungen</h2>
-        <p class="mt-1 text-sm text-slate-500">Veränderung in 24 Stunden, Verlauf der letzten 7 Tage</p>
-      </div>
+      <h2 class="text-xl font-extrabold tracking-tight">Krypto</h2>
       <div class="inline-flex rounded-full border border-slate-200 bg-white p-1" role="group" aria-label="Währung wählen" id="curSwitch">
         <button type="button" data-cur="chf" class="rounded-full px-4 py-1.5 text-sm font-bold transition">CHF</button>
         <button type="button" data-cur="usd" class="rounded-full px-4 py-1.5 text-sm font-bold transition">USD</button>
@@ -152,18 +133,12 @@
 
 <!-- 7. Footer -->
 <footer class="border-t border-slate-200/80 bg-white">
-  <div class="mx-auto grid max-w-5xl gap-8 px-5 py-10 sm:grid-cols-3">
-    <div class="sm:col-span-2">
-      <div class="flex items-center gap-2.5 font-extrabold tracking-tight">
-        <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#4f46e5"/><path d="M7 21l6-7 4 4 8-9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Kursblick
-      </div>
-      <p class="mt-3 max-w-md text-sm leading-relaxed text-slate-500">Eine schlichte Kursübersicht für Aktien und Krypto. Aktienkurse stammen von Yahoo Finance, Kryptokurse von CoinGecko. Die Daten können verzögert sein und sind keine Anlageberatung.</p>
-    </div>
-    <div class="flex flex-col items-start gap-2 text-sm font-semibold text-slate-600">
+  <div class="mx-auto flex max-w-5xl items-center justify-between px-5 py-6 text-sm font-semibold text-slate-500">
+    <span>Kursblick</span>
+    <span class="flex gap-5">
       <button type="button" data-open="dlgImpressum" class="hover:text-indigo-600">Impressum</button>
       <button type="button" data-open="dlgDatenschutz" class="hover:text-indigo-600">Datenschutz</button>
-    </div>
+    </span>
   </div>
 </footer>
 
@@ -265,25 +240,21 @@
   var busy = false, timer = null;
 
   /* ---------- Darstellung ---------- */
-  function avatar(label) {
-    var t = String(label || '?').replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase() || '?';
-    return '<span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-xs font-extrabold text-indigo-700">' + esc(t) + '</span>';
-  }
   function isWatched(t, id) { return watch.some(function (w) { return w.t === t && w.id === id; }); }
 
   function row(it) {
     var key = it.t + ':' + it.id, d = data[key], on = isWatched(it.t, it.id);
     var star = '<button type="button" data-star="' + esc(key) + '" class="' + (on ? 'starred ' : '') +
-      'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-300 transition hover:bg-slate-100 hover:text-amber-500" aria-label="' +
-      (on ? 'Aus Watchlist entfernen' : 'Zur Watchlist hinzufügen') + '" aria-pressed="' + on + '"><i data-lucide="star" class="h-[18px] w-[18px]"></i></button>';
-    var name = '<div class="min-w-0 flex-1"><p class="truncate text-[15px] font-bold">' + esc(it.n) + '</p><p class="truncate text-xs text-slate-500">' + esc(it.s || it.id) + '</p></div>';
+      'flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-300 transition hover:bg-slate-100 hover:text-amber-500" aria-label="' +
+      (on ? 'Aus Watchlist entfernen' : 'Zur Watchlist hinzufügen') + '" aria-pressed="' + on + '"><i data-lucide="star" class="h-5 w-5"></i></button>';
+    var name = '<div class="min-w-0 flex-1"><p class="break-words text-base font-bold leading-snug">' + esc(it.n) + '</p><p class="text-xs text-slate-500">' + esc(it.s || it.id) + '</p></div>';
     if (!d) {
-      return '<div class="flex items-center gap-3 px-4 py-3.5 sm:px-5">' + avatar(it.s || it.n) + name +
-        '<div class="h-8 w-24 animate-pulse rounded-lg bg-slate-100"></div>' + star + '</div>';
+      return '<div class="flex items-center gap-3 px-4 py-3 sm:px-5">' + name +
+        '<div class="h-10 w-24 animate-pulse rounded-lg bg-slate-100"></div>' + star + '</div>';
     }
-    return '<div class="flex items-center gap-3 px-4 py-3.5 sm:px-5">' + avatar(it.s || it.n) + name +
-      '<div class="shrink-0">' + spark(d.spark) + '</div>' +
-      '<div class="w-[6.5rem] shrink-0 text-right sm:w-32"><p class="text-[15px] font-bold tabular-nums">' + price(d.price) +
+    return '<div class="flex items-center gap-3 px-4 py-3 sm:px-5">' + name +
+      '<div class="hidden shrink-0 sm:block">' + spark(d.spark) + '</div>' +
+      '<div class="shrink-0 text-right"><p class="text-base font-bold tabular-nums">' + price(d.price) +
       ' <span class="text-xs font-semibold text-slate-400">' + esc(d.cur) + '</span></p>' + pctPill(d.pct) + '</div>' + star + '</div>';
   }
   function list(items, empty) {
@@ -304,8 +275,7 @@
     // Watchlist
     var wl = watch.map(function (w) { return { t: w.t, id: w.id, n: w.n, s: w.s }; });
     $('#watchBox').innerHTML = list(wl,
-      '<div class="px-5 py-10 text-center"><p class="font-bold text-slate-700">Noch nichts auf deiner Watchlist</p>' +
-      '<p class="mt-1 text-sm text-slate-500">Tippe bei einem Titel auf den Stern oder nutze oben die Suche.</p></div>');
+      '<p class="px-5 py-8 text-center text-sm text-slate-500">Leer. Stern antippen oder suchen.</p>');
 
     // Aktien
     $('#stockBox').innerHTML = list(STOCKS.map(function (x) { return { t: 's', id: x[0], n: x[1], s: x[0] }; }), '');
@@ -325,8 +295,8 @@
 
   function stamp() {
     var el = $('#stamp');
-    if (!lastUpdate) { el.textContent = 'Noch keine Daten'; return; }
-    el.textContent = 'Zuletzt aktualisiert um ' + new Date(lastUpdate).toLocaleTimeString('de-CH');
+    if (!lastUpdate) { el.textContent = ''; return; }
+    el.textContent = 'Stand ' + new Date(lastUpdate).toLocaleTimeString('de-CH');
   }
   function notice(msg) {
     var n = $('#notice');
