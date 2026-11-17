@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="de-CH" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Teigwerk: Pizza-, Sauerteig- und Focaccia-Rechner</title>
+<meta name="description" content="Teigwerk berechnet Mehl, Wasser, Salz und Hefe für Pizza, Sauerteigbrot und Focaccia. Gramm genau, kostenlos und direkt im Browser.">
+<meta name="theme-color" content="#fbf6ef">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23c24a16'/%3E%3Cellipse cx='16' cy='17' rx='9' ry='7' fill='%23fbf6ef'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          serif: ['"Playfair Display"', 'Georgia', 'serif']
+        },
+        colors: {
+          cream: '#fbf6ef',
+          brand: {
+            50: '#fdf3ec', 100: '#fbe3d1', 200: '#f6c5a0', 300: '#ef9f68', 400: '#e67a3c',
+            500: '#d95f1f', 600: '#c24a16', 700: '#a13a14', 800: '#833117', 900: '#6c2b16'
+          }
+        }
+      }
+    }
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  section[id] { scroll-margin-top: 5rem; }
+  body { background: #fbf6ef; }
+  .mesh {
+    background:
+      radial-gradient(60% 50% at 85% 0%, rgba(230,122,60,.22), transparent 70%),
+      radial-gradient(50% 45% at 0% 20%, rgba(246,197,160,.45), transparent 70%),
+      radial-gradient(40% 40% at 60% 100%, rgba(217,95,31,.10), transparent 70%);
+  }
+  .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+  .js .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .js .reveal { opacity: 1; transform: none; transition: none; }
+  }
+  input[type=range] { accent-color: #c24a16; }
+  .bar { transition: width .35s cubic-bezier(.2,.8,.2,1); }
+  .seg-active { background: #c24a16; color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.15); }
+  .field-error { display: none; }
+  .has-error .field-error { display: block; }
+  .has-error input, .has-error textarea, .has-error select { border-color: #dc2626; }
+  body.modal-open { overflow: hidden; }
+</style>
+</head>
+<body class="font-sans text-stone-900 antialiased">
+
+<!-- 1. Sticky Navigation -->
+<header id="top" class="sticky top-0 z-50 border-b border-stone-200/80 bg-cream/80 backdrop-blur-xl">
+  <nav class="mx-auto flex h-16 max-w-6xl items-center justify-between px-5" aria-label="Hauptnavigation">
+    <a href="#top" class="flex items-center gap-2.5" aria-label="Teigwerk, zum Seitenanfang">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+        <rect width="34" height="34" rx="10" fill="#c24a16"/>
+        <ellipse cx="17" cy="18.5" rx="10" ry="7.5" fill="#fbf6ef"/>
+        <path d="M11.5 15.2c2.2-2.6 8.8-2.6 11 0" stroke="#c24a16" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="14" cy="19" r="1.3" fill="#f6c5a0"/>
+        <circle cx="19.5" cy="18" r="1.7" fill="#f6c5a0"/>
+        <circle cx="21" cy="21.4" r="1" fill="#f6c5a0"/>
+      </svg>
+      <span class="font-serif text-xl font-bold tracking-tight">Teigwerk</span>
+    </a>
+    <ul class="hidden items-center gap-8 text-sm font-medium text-stone-600 md:flex">
+      <li><a class="transition hover:text-brand-700" href="#rechner">Rechner</a></li>
+      <li><a class="transition hover:text-brand-700" href="#ablauf">Ablauf</a></li>
+      <li><a class="transition hover:text-brand-700" href="#preise">Preise</a></li>
+      <li><a class="transition hover:text-brand-700" href="#faq">FAQ</a></li>
+    </ul>
+    <div class="flex items-center gap-2">
+      <a href="#kontakt" class="hidden rounded-full bg-stone-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 sm:inline-flex">Kostenlos starten</a>
+      <button id="menuBtn" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white/70 md:hidden" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobileMenu">
+        <i data-lucide="menu" class="h-5 w-5" id="menuIcon"></i>
+      </button>
+    </div>
+  </nav>
+  <div id="mobileMenu" class="hidden border-t border-stone-200/80 bg-cream/95 px-5 pb-5 pt-3 md:hidden">
+    <ul class="flex flex-col text-base font-medium">
+      <li><a class="mobile-link block rounded-xl px-3 py-3 hover:bg-brand-50" href="#rechner">Rechner</a></li>
+      <li><a class="mobile-link block rounded-xl px-3 py-3 hover:bg-brand-50" href="#ablauf">Ablauf</a></li>
+      <li><a class="mobile-link block rounded-xl px-3 py-3 hover:bg-brand-50" href="#preise">Preise</a></li>
+      <li><a class="mobile-link block rounded-xl px-3 py-3 hover:bg-brand-50" href="#faq">FAQ</a></li>
+    </ul>
+    <a href="#kontakt" class="mobile-link mt-3 flex items-center justify-center rounded-full bg-brand-600 px-5 py-3 font-semibold text-white">Kostenlos starten</a>
+  </div>
+</header>
+
+<main>
+<!-- 2. Hero -->
+<section class="mesh relative overflow-hidden">
+  <div class="mx-auto grid max-w-6xl items-center gap-12 px-5 pb-16 pt-12 sm:pt-16 lg:grid-cols-2 lg:gap-10 lg:pb-24 lg:pt-20">
+    <div class="reveal">
+      <span class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/80 px-3.5 py-1.5 text-xs font-semibold text-brand-800 shadow-sm">
+        <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-70"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-brand-600"></span></span>
+        Neu: Sauerteig-Rechner mit Anstellgut
+      </span>
+      <h1 class="mt-5 font-serif text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
+        Teig berechnen, <span class="italic text-brand-600">gramm genau</span> und ohne Taschenrechner.
+      </h1>
+      <p class="mt-5 max-w-xl text-lg leading-relaxed text-stone-600">
+        Teigwerk rechnet Mehl, Wasser, Salz und Hefe für Pizza, Sauerteigbrot und Focaccia. Mengen eingeben, Ergebnis ablesen, kneten.
+      </p>
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+        <a href="#rechner-demo" class="inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:-translate-y-0.5 hover:bg-brand-700">
+          Rechner ausprobieren <i data-lucide="arrow-right" class="h-4 w-4"></i>
+        </a>
+        <a href="#ablauf" class="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white/70 px-6 py-3.5 font-semibold text-stone-800 transition hover:border-stone-400 hover:bg-white">
+          So funktioniert es
+        </a>
+      </div>
+      <p class="mt-5 flex items-center gap-2 text-sm text-stone-500"><i data-lucide="check" class="h-4 w-4 text-brand-600"></i> Kostenlos, ohne Anmeldung, läuft direkt im Browser</p>
+    </div>
+
+    <!-- Interaktive Rechner-Karte -->
+    <div id="rechner-demo" class="reveal relative scroll-mt-24">
+      <div class="absolute -inset-4 -z-10 rounded-[2.5rem] bg-gradient-to-br from-brand-200/60 via-transparent to-brand-300/40 blur-2xl"></div>
+      <div class="rounded-3xl border border-stone-200/80 bg-white p-4 shadow-xl shadow-stone-900/5 sm:p-6">
+        <div class="flex items-center justify-between">
+          <p class="text-sm font-semibold text-stone-500">Teig-Rechner</p>
+          <button id="copyBtn" type="button" class="inline-flex items-center gap-1.5 rounded-full border border-stone-200 px-3 py-1.5 text-xs font-semibold text-stone-600 transition hover:border-brand-300 hover:text-brand-700">
+            <i data-lucide="copy" class="h-3.5 w-3.5"></i> <span id="copyLabel">Kopieren</span>
+          </button>
+        </div>
+        <div id="tabs" class="mt-3 grid grid-cols-3 gap-1 rounded-2xl bg-stone-100 p-1" role="tablist" aria-label="Rezeptart"></div>
+        <div id="inputs" class="mt-5 space-y-4"></div>
+        <div class="mt-5 rounded-2xl border border-stone-200/80 bg-cream p-4" aria-live="polite">
+          <div id="results" class="space-y-3"></div>
+          <div class="mt-4 flex items-baseline justify-between border-t border-stone-200 pt-3">
+            <span class="text-sm font-medium text-stone-500">Teiggewicht gesamt</span>
+            <span id="total" class="font-serif text-2xl font-bold text-stone-900"></span>
+          </div>
+          <p id="note" class="mt-2 text-xs leading-relaxed text-stone-500"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Trust-Bar -->
+<section class="border-y border-stone-200/80 bg-white/60">
+  <div class="mx-auto grid max-w-6xl grid-cols-2 gap-y-6 px-5 py-8 md:grid-cols-4">
+    <div class="reveal text-center"><p class="font-serif text-3xl font-bold text-brand-700">8'400+</p><p class="mt-1 text-sm text-stone-600">berechnete Teige</p></div>
+    <div class="reveal text-center"><p class="font-serif text-3xl font-bold text-brand-700">4,9 / 5</p><p class="mt-1 text-sm text-stone-600">Bewertung von Hobbybäckern</p></div>
+    <div class="reveal text-center"><p class="font-serif text-3xl font-bold text-brand-700">3</p><p class="mt-1 text-sm text-stone-600">Rechner für Pizza, Brot, Focaccia</p></div>
+    <div class="reveal text-center"><p class="font-serif text-3xl font-bold text-brand-700">CHF 0</p><p class="mt-1 text-sm text-stone-600">für den Basis-Rechner</p></div>
+  </div>
+</section>
+
+<!-- 4. Bento-Grid -->
+<section id="rechner" class="mx-auto max-w-6xl px-5 py-20 sm:py-28">
+  <div class="reveal max-w-2xl">
+    <p class="text-sm font-bold uppercase tracking-widest text-brand-600">Rechner und Werkzeuge</p>
+    <h2 class="mt-3 font-serif text-3xl font-bold tracking-tight sm:text-4xl">Alles, was zwischen Mehl und Ofen passiert.</h2>
+    <p class="mt-4 text-lg text-stone-600">Sechs Werkzeuge, die zusammenspielen. Du brauchst nur das, was du gerade backst.</p>
+  </div>
+
+  <div class="mt-12 grid gap-4 md:grid-cols-6">
+    <article class="reveal rounded-3xl border border-stone-200/80 bg-white p-6 md:col-span-4">
+      <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-100 text-brand-700"><i data-lucide="pizza" class="h-5 w-5"></i></div>
+      <h3 class="mt-4 text-xl font-bold">Pizza-Rechner</h3>
+      <p class="mt-2 max-w-md text-stone-600">Anzahl Pizzen, Ballengewicht, Hydration und Gärzeit eingeben. Die Hefemenge passt sich der Gärzeit an, von 8 bis 48 Stunden.</p>
+      <div class="mt-5 space-y-2" aria-hidden="true">
+        <div class="flex items-center gap-3 text-xs font-medium text-stone-500"><span class="w-14">Mehl</span><div class="h-2.5 flex-1 rounded-full bg-stone-100"><div class="h-2.5 w-full rounded-full bg-brand-600"></div></div></div>
+        <div class="flex items-center gap-3 text-xs font-medium text-stone-500"><span class="w-14">Wasser</span><div class="h-2.5 flex-1 rounded-full bg-stone-100"><div class="h-2.5 w-[62%] rounded-full bg-brand-400"></div></div></div>
+        <div class="flex items-center gap-3 text-xs font-medium text-stone-500"><span class="w-14">Salz</span><div class="h-2.5 flex-1 rounded-full bg-stone-100"><div class="h-2.5 w-[3%] rounded-full bg-brand-300"></div></div></div>
+      </div>
+    </article>
+
+    <article class="reveal rounded-3xl border border-stone-200/80 bg-stone-900 p-6 text-white md:col-span-2">
+      <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-brand-300"><i data-lucide="wheat" class="h-5 w-5"></i></div>
+      <h3 class="mt-4 text-xl font-bold">Sauerteig-Rechner</h3>
+      <p class="mt-2 text-stone-300">Rechnet das Anstellgut sauber in Mehl und Wasser ein. Kein Raten mehr bei der Hydration.</p>
+    </article>
+
+    <article class="reveal rounded-3xl border border-stone-200/80 bg-white p-6 md:col-span-2">
+      <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-100 text-brand-700"><i data-lucide="cookie" class="h-5 w-5"></i></div>
+      <h3 class="mt-4 text-xl font-bold">Focaccia</h3>
+      <p class="mt-2 text-stone-600">Hohe Hydration, Olivenöl und wenig Hefe, auf den Punkt berechnet.</p>
+    </article>
+
+    <article class="reveal rounded-3xl border border-stone-200/80 bg-gradient-to-br from-brand-50 to-white p-6 md:col-span-4">
+      <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-100 text-brand-700"><i data-lucide="timer" class="h-5 w-5"></i></div>
+      <h3 class="mt-4 text-xl font-bold">Zeitplan für die Gare</h3>
+      <p class="mt-2 max-w-md text-stone-600">Sag, wann du essen willst. Teigwerk rechnet rückwärts, wann du kneten, falten und in den Kühlschrank stellen musst.</p>
+      <div class="mt-5 flex items-center gap-2 text-xs font-semibold" aria-hidden="true">
+        <span class="rounded-full bg-brand-600 px-3 py-1.5 text-white">Fr 18:00 kneten</span>
+        <span class="h-px w-6 bg-stone-300"></span>
+        <span class="rounded-full bg-white px-3 py-1.5 text-stone-700 ring-1 ring-stone-200">Kühlschrank</span>
+        <span class="h-px w-6 bg-stone-300"></span>
+        <span class="rounded-full bg-white px-3 py-1.5 text-stone-700 ring-1 ring-stone-200">Sa 19:30 backen</span>
+      </div>
+    </article>
+
+    <article class="reveal rounded-3xl border border-stone-200/80 bg-white p-6 md:col-span-3">
+      <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-100 text-brand-700"><i data-lucide="bookmark" class="h-5 w-5"></i></div>
+      <h3 class="mt-4 text-xl font-bold">Rezepte speichern</h3>
+      <p class="mt-2 text-stone-600">Deine besten Teige als Vorlage ablegen und beim nächsten Mal mit einem Tipp laden.</p>
+    </article>
+
+    <article class="reveal rounded-3xl border border-stone-200/80 bg-white p-6 md:col-span-3">
+      <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-100 text-brand-700"><i data-lucide="scale" class="h-5 w-5"></i></div>
+      <h3 class="mt-4 text-xl font-bold">Umskalieren</h3>
+      <p class="mt-2 text-stone-600">Aus 2 Pizzen werden 20 für das Sommerfest. Alle Mengen wachsen im richtigen Verhältnis mit.</p>
+    </article>
+  </div>
+</section>
+
+<!-- 5. Ablauf -->
+<section id="ablauf" class="border-y border-stone-200/80 bg-white/60">
+  <div class="mx-auto max-w-6xl px-5 py-20 sm:py-28">
+    <div class="reveal max-w-2xl">
+      <p class="text-sm font-bold uppercase tracking-widest text-brand-600">So funktioniert es</p>
+      <h2 class="mt-3 font-serif text-3xl font-bold tracking-tight sm:text-4xl">In drei Schritten vom Plan zum Teig.</h2>
+    </div>
+    <ol class="mt-12 grid gap-5 md:grid-cols-3">
+      <li class="reveal rounded-3xl border border-stone-200/80 bg-cream p-6">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 text-lg font-bold text-white">1</span>
+        <h3 class="mt-4 text-lg font-bold">Rezeptart wählen</h3>
+        <p class="mt-2 text-stone-600">Pizza, Sauerteigbrot oder Focaccia. Jede Art bringt sinnvolle Startwerte für Hydration und Salz mit.</p>
+      </li>
+      <li class="reveal rounded-3xl border border-stone-200/80 bg-cream p-6">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 text-lg font-bold text-white">2</span>
+        <h3 class="mt-4 text-lg font-bold">Eckdaten einstellen</h3>
+        <p class="mt-2 text-stone-600">Menge, Hydration und Gärzeit mit den Reglern setzen. Das Ergebnis aktualisiert sich bei jeder Bewegung.</p>
+      </li>
+      <li class="reveal rounded-3xl border border-stone-200/80 bg-cream p-6">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 text-lg font-bold text-white">3</span>
+        <h3 class="mt-4 text-lg font-bold">Abwägen und kneten</h3>
+        <p class="mt-2 text-stone-600">Die Mengen in Gramm ablesen, mit einem Tipp kopieren und direkt in der Küche loslegen.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- 6. Preise -->
+<section id="preise" class="mx-auto max-w-6xl px-5 py-20 sm:py-28">
+  <div class="reveal mx-auto max-w-2xl text-center">
+    <p class="text-sm font-bold uppercase tracking-widest text-brand-600">Angebot</p>
+    <h2 class="mt-3 font-serif text-3xl font-bold tracking-tight sm:text-4xl">Gratis backen, später mehr dazu.</h2>
+    <p class="mt-4 text-lg text-stone-600">Die Rechner bleiben kostenlos. Wer Rezepte speichern oder im Team arbeiten will, wählt eine Stufe.</p>
+  </div>
+  <div class="mt-12 grid items-stretch gap-5 md:grid-cols-3">
+    <div class="reveal flex flex-col rounded-3xl border border-stone-200/80 bg-white p-7">
+      <h3 class="text-lg font-bold">Basis</h3>
+      <p class="mt-3"><span class="font-serif text-4xl font-bold">CHF 0</span></p>
+      <p class="mt-1 text-sm text-stone-500">für immer gratis</p>
+      <ul class="mt-6 space-y-3 text-sm text-stone-700">
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600"></i> Pizza-, Sauerteig- und Focaccia-Rechner</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600"></i> Mengen in Gramm kopieren</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600"></i> Keine Anmeldung nötig</li>
+      </ul>
+      <a href="#kontakt" class="mt-8 inline-flex items-center justify-center rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold transition hover:border-stone-400 hover:bg-stone-50">Jetzt nutzen</a>
+    </div>
+
+    <div class="reveal relative flex flex-col rounded-3xl border-2 border-brand-600 bg-white p-7 shadow-xl shadow-brand-600/10 md:-translate-y-3">
+      <span class="absolute -top-3 left-7 rounded-full bg-brand-600 px-3 py-1 text-xs font-bold text-white">Beliebt</span>
+      <h3 class="text-lg font-bold">Teigprofi</h3>
+      <p class="mt-3"><span class="font-serif text-4xl font-bold">CHF 4.90</span> <span class="text-sm text-stone-500">pro Monat</span></p>
+      <p class="mt-1 text-sm text-stone-500">monatlich kündbar</p>
+      <ul class="mt-6 space-y-3 text-sm text-stone-700">
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600"></i> Alles aus Basis</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600"></i> Unbegrenzt Rezepte speichern</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600"></i> Zeitplan mit Erinnerung</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600"></i> Anstellgut-Tagebuch</li>
+      </ul>
+      <a href="#kontakt" class="mt-8 inline-flex items-center justify-center rounded-full bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">Teigprofi anfragen</a>
+    </div>
+
+    <div class="reveal flex flex-col rounded-3xl border border-stone-200/80 bg-white p-7">
+      <h3 class="text-lg font-bold">Bäckerei</h3>
+      <p class="mt-3"><span class="font-serif text-4xl font-bold">CHF 19</span> <span class="text-sm text-stone-500">pro Monat</span></p>
+      <p class="mt-1 text-sm text-stone-500">für Teams bis 5 Personen</p>
+      <ul class="mt-6 space-y-3 text-sm text-stone-700">
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600"></i> Alles aus Teigprofi</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600"></i> Grossmengen bis 50 kg Mehl</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600"></i> Gemeinsame Rezeptsammlung</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-600"></i> Persönlicher Support</li>
+      </ul>
+      <a href="#kontakt" class="mt-8 inline-flex items-center justify-center rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold transition hover:border-stone-400 hover:bg-stone-50">Beratung anfragen</a>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Kundenstimmen -->
+<section class="border-y border-stone-200/80 bg-white/60">
+  <div class="mx-auto max-w-6xl px-5 py-20 sm:py-28">
+    <div class="reveal max-w-2xl">
+      <p class="text-sm font-bold uppercase tracking-widest text-brand-600">Kundenstimmen</p>
+      <h2 class="mt-3 font-serif text-3xl font-bold tracking-tight sm:text-4xl">Was Backende sagen.</h2>
+    </div>
+    <div class="mt-12 grid gap-5 md:grid-cols-3">
+      <figure class="reveal rounded-3xl border border-stone-200/80 bg-cream p-6">
+        <div class="flex gap-0.5 text-brand-500" aria-label="5 von 5 Sternen">
+          <i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i>
+        </div>
+        <blockquote class="mt-4 leading-relaxed text-stone-700">Ich habe jahrelang mit Zetteln und Faustregeln gebacken. Seit ich die Hydration mit Teigwerk einstelle, gelingt mein Pizzateig jedes Mal gleich.</blockquote>
+        <figcaption class="mt-5 text-sm"><span class="font-bold">Lea Gerber</span><br><span class="text-stone-500">Hobbybäckerin, Thun</span></figcaption>
+      </figure>
+      <figure class="reveal rounded-3xl border border-stone-200/80 bg-cream p-6">
+        <div class="flex gap-0.5 text-brand-500" aria-label="5 von 5 Sternen">
+          <i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i>
+        </div>
+        <blockquote class="mt-4 leading-relaxed text-stone-700">Für unsere Samstagsrunde skaliere ich von 6 auf 40 Pizzen. Die Hefemenge bei 48 Stunden Gärzeit stimmt auf Anhieb, das spart mir Probeteige.</blockquote>
+        <figcaption class="mt-5 text-sm"><span class="font-bold">Marco Bianchi</span><br><span class="text-stone-500">Pizzaiolo, Luzern</span></figcaption>
+      </figure>
+      <figure class="reveal rounded-3xl border border-stone-200/80 bg-cream p-6">
+        <div class="flex gap-0.5 text-brand-500" aria-label="5 von 5 Sternen">
+          <i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i>
+        </div>
+        <blockquote class="mt-4 leading-relaxed text-stone-700">Der Sauerteig-Rechner zieht das Anstellgut korrekt vom Mehl und Wasser ab. Genau das fehlte mir, um meine Kursunterlagen sauber zu halten.</blockquote>
+        <figcaption class="mt-5 text-sm"><span class="font-bold">Sandra Keller</span><br><span class="text-stone-500">Bäckerin EFZ, Winterthur</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 8. FAQ -->
+<section id="faq" class="mx-auto max-w-3xl px-5 py-20 sm:py-28">
+  <div class="reveal text-center">
+    <p class="text-sm font-bold uppercase tracking-widest text-brand-600">Häufige Fragen</p>
+    <h2 class="mt-3 font-serif text-3xl font-bold tracking-tight sm:text-4xl">Gut zu wissen.</h2>
+  </div>
+  <div id="faqList" class="reveal mt-10 divide-y divide-stone-200 rounded-3xl border border-stone-200/80 bg-white">
+    <div class="faq-item">
+      <button class="faq-btn flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-semibold" aria-expanded="false">
+        Was bedeutet Hydration?
+        <i data-lucide="chevron-down" class="faq-icon h-5 w-5 shrink-0 text-stone-400 transition-transform"></i>
+      </button>
+      <div class="faq-panel grid grid-rows-[0fr] transition-all duration-300">
+        <div class="overflow-hidden"><p class="px-6 pb-5 text-stone-600">Hydration ist die Wassermenge in Prozent vom Mehlgewicht. 500 g Mehl mit 325 g Wasser ergeben 65 % Hydration. Je höher der Wert, desto weicher und offenporiger wird der Teig.</p></div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-btn flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-semibold" aria-expanded="false">
+        Wie wird das Anstellgut beim Sauerteig eingerechnet?
+        <i data-lucide="chevron-down" class="faq-icon h-5 w-5 shrink-0 text-stone-400 transition-transform"></i>
+      </button>
+      <div class="faq-panel grid grid-rows-[0fr] transition-all duration-300">
+        <div class="overflow-hidden"><p class="px-6 pb-5 text-stone-600">Das Anstellgut zählt zur Hälfte als Mehl und zur Hälfte als Wasser (bei 100 % Hydration). Diese Anteile ziehen wir von den Hauptzutaten ab, damit die Gesamt-Hydration stimmt.</p></div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-btn flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-semibold" aria-expanded="false">
+        Frischhefe oder Trockenhefe?
+        <i data-lucide="chevron-down" class="faq-icon h-5 w-5 shrink-0 text-stone-400 transition-transform"></i>
+      </button>
+      <div class="faq-panel grid grid-rows-[0fr] transition-all duration-300">
+        <div class="overflow-hidden"><p class="px-6 pb-5 text-stone-600">Die Rechner geben Frischhefe an. Für Trockenhefe nimmst du etwa ein Drittel der Menge. Aus 3 g Frischhefe werden also rund 1 g Trockenhefe.</p></div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-btn flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-semibold" aria-expanded="false">
+        Kann ich meine Rezepte speichern?
+        <i data-lucide="chevron-down" class="faq-icon h-5 w-5 shrink-0 text-stone-400 transition-transform"></i>
+      </button>
+      <div class="faq-panel grid grid-rows-[0fr] transition-all duration-300">
+        <div class="overflow-hidden"><p class="px-6 pb-5 text-stone-600">Im Tarif Teigprofi legst du beliebig viele Rezepte ab und lädst sie später wieder. Im Basis-Tarif kopierst du die Mengen und fügst sie in deine Notizen ein.</p></div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-btn flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-semibold" aria-expanded="false">
+        Ist der Basis-Rechner wirklich gratis?
+        <i data-lucide="chevron-down" class="faq-icon h-5 w-5 shrink-0 text-stone-400 transition-transform"></i>
+      </button>
+      <div class="faq-panel grid grid-rows-[0fr] transition-all duration-300">
+        <div class="overflow-hidden"><p class="px-6 pb-5 text-stone-600">Ja. Die drei Rechner bleiben kostenlos, ohne Konto und ohne Werbung. Bezahlt wird nur für Zusatzfunktionen wie Speichern und Teamzugang.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. Kontakt -->
+<section id="kontakt" class="border-t border-stone-200/80 bg-white/60">
+  <div class="mx-auto grid max-w-6xl gap-10 px-5 py-20 sm:py-28 lg:grid-cols-5">
+    <div class="reveal lg:col-span-2">
+      <p class="text-sm font-bold uppercase tracking-widest text-brand-600">Kontakt</p>
+      <h2 class="mt-3 font-serif text-3xl font-bold tracking-tight sm:text-4xl">Fragen, Wünsche, Feedback?</h2>
+      <p class="mt-4 text-lg text-stone-600">Schreib uns kurz. Wir antworten in der Regel innert zwei Werktagen.</p>
+      <ul class="mt-6 space-y-3 text-stone-700">
+        <li class="flex items-center gap-3"><i data-lucide="mail" class="h-5 w-5 text-brand-600"></i> hallo@teigwerk.ch</li>
+        <li class="flex items-center gap-3"><i data-lucide="map-pin" class="h-5 w-5 text-brand-600"></i> Brotgasse 12, 3011 Bern</li>
+        <li class="flex items-center gap-3"><i data-lucide="clock" class="h-5 w-5 text-brand-600"></i> Mo bis Fr, 8:00 bis 17:00 Uhr</li>
+      </ul>
+    </div>
+    <div class="reveal lg:col-span-3">
+      <div class="rounded-3xl border border-stone-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <form id="contactForm" novalidate class="space-y-5">
+          <div class="field">
+            <label for="name" class="text-sm font-semibold">Name</label>
+            <input id="name" name="name" type="text" autocomplete="name" class="mt-1.5 w-full rounded-xl border border-stone-300 bg-cream px-4 py-3 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100">
+            <p class="field-error mt-1 text-sm text-red-600">Bitte gib deinen Namen an.</p>
+          </div>
+          <div class="field">
+            <label for="email" class="text-sm font-semibold">E-Mail</label>
+            <input id="email" name="email" type="email" autocomplete="email" class="mt-1.5 w-full rounded-xl border border-stone-300 bg-cream px-4 py-3 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100">
+            <p class="field-error mt-1 text-sm text-red-600">Bitte gib eine gültige E-Mail-Adresse an.</p>
+          </div>
+          <div class="field">
+            <label for="topic" class="text-sm font-semibold">Worum geht es?</label>
+            <select id="topic" name="topic" class="mt-1.5 w-full rounded-xl border border-stone-300 bg-cream px-4 py-3 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100">
+              <option>Frage zu den Rechnern</option>
+              <option>Teigprofi oder Bäckerei anfragen</option>
+              <option>Feedback oder Wunsch</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="message" class="text-sm font-semibold">Nachricht</label>
+            <textarea id="message" name="message" rows="4" class="mt-1.5 w-full rounded-xl border border-stone-300 bg-cream px-4 py-3 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100"></textarea>
+            <p class="field-error mt-1 text-sm text-red-600">Bitte schreib mindestens 10 Zeichen.</p>
+          </div>
+          <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-700">
+            Nachricht senden <i data-lucide="send" class="h-4 w-4"></i>
+          </button>
+        </form>
+        <div id="formSuccess" class="hidden py-8 text-center" role="status">
+          <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-brand-700"><i data-lucide="check" class="h-7 w-7"></i></div>
+          <h3 class="mt-4 font-serif text-2xl font-bold">Danke für deine Nachricht!</h3>
+          <p class="mt-2 text-stone-600">Wir melden uns in den nächsten zwei Werktagen bei dir.</p>
+          <button id="formReset" type="button" class="mt-5 text-sm font-semibold text-brand-700 underline underline-offset-4">Weitere Nachricht schreiben</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- Footer -->
+<footer class="border-t border-stone-200/80 bg-stone-900 text-stone-300">
+  <div class="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-3">
+    <div>
+      <p class="font-serif text-2xl font-bold text-white">Teigwerk</p>
+      <p class="mt-3 max-w-xs text-sm leading-relaxed">Rechner für Pizza, Sauerteigbrot und Focaccia. Gramm genau, direkt im Browser.</p>
+    </div>
+    <div>
+      <p class="text-sm font-bold uppercase tracking-widest text-stone-400">Seiten</p>
+      <ul class="mt-3 space-y-2 text-sm">
+        <li><a class="hover:text-white" href="#rechner">Rechner</a></li>
+        <li><a class="hover:text-white" href="#ablauf">Ablauf</a></li>
+        <li><a class="hover:text-white" href="#preise">Preise</a></li>
+        <li><a class="hover:text-white" href="#faq">FAQ</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="text-sm font-bold uppercase tracking-widest text-stone-400">Kontakt</p>
+      <ul class="mt-3 space-y-2 text-sm">
+        <li>hallo@teigwerk.ch</li>
+        <li>Brotgasse 12, 3011 Bern</li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-white/10">
+    <div class="mx-auto flex max-w-6xl flex-col items-start justify-between gap-3 px-5 py-5 text-sm sm:flex-row sm:items-center">
+      <p>© 2026 Teigwerk. Alle Rechte vorbehalten.</p>
+      <div class="flex gap-5">
+        <button type="button" class="open-modal hover:text-white" data-modal="impressum">Impressum</button>
+        <button type="button" class="open-modal hover:text-white" data-modal="datenschutz">Datenschutz</button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Modals -->
+<div id="modal-impressum" class="modal fixed inset-0 z-[60] hidden items-end justify-center bg-stone-900/60 p-0 backdrop-blur-sm sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-labelledby="impressum-title">
+  <div class="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-6 sm:rounded-3xl sm:p-8">
+    <div class="flex items-start justify-between gap-4">
+      <h2 id="impressum-title" class="font-serif text-2xl font-bold">Impressum</h2>
+      <button type="button" class="close-modal inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-200" aria-label="Schliessen"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div>
+    <div class="mt-4 space-y-3 text-sm leading-relaxed text-stone-600">
+      <p><strong class="text-stone-900">Teigwerk</strong><br>Brotgasse 12<br>3011 Bern<br>Schweiz</p>
+      <p>E-Mail: hallo@teigwerk.ch</p>
+      <p>Verantwortlich für den Inhalt: Teigwerk, Bern.</p>
+      <p>Die Berechnungen sind Richtwerte für die Küche. Abweichungen durch Mehlsorte, Raumtemperatur und Hefe sind normal.</p>
+    </div>
+  </div>
+</div>
+
+<div id="modal-datenschutz" class="modal fixed inset-0 z-[60] hidden items-end justify-center bg-stone-900/60 p-0 backdrop-blur-sm sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-labelledby="datenschutz-title">
+  <div class="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-6 sm:rounded-3xl sm:p-8">
+    <div class="flex items-start justify-between gap-4">
+      <h2 id="datenschutz-title" class="font-serif text-2xl font-bold">Datenschutz</h2>
+      <button type="button" class="close-modal inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-200" aria-label="Schliessen"><i data-lucide="x" class="h-4 w-4"></i></button>
+    </div>
+    <div class="mt-4 space-y-3 text-sm leading-relaxed text-stone-600">
+      <p>Die Rechner laufen vollständig in deinem Browser. Deine Eingaben verlassen dein Gerät nicht und werden nicht gespeichert.</p>
+      <p>Wenn du uns über das Kontaktformular schreibst, verwenden wir Name, E-Mail-Adresse und Nachricht nur, um dir zu antworten. Wir geben sie nicht an Dritte weiter.</p>
+      <p>Schriften, Icons und Layout-Bibliotheken werden von externen Servern (Google Fonts, unpkg, Tailwind CDN) geladen. Dabei kann deine IP-Adresse an diese Anbieter übermittelt werden.</p>
+      <p>Anfragen zu deinen Daten richtest du an hallo@teigwerk.ch.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // Icons
+  function icons() { if (window.lucide) lucide.createIcons(); }
+  icons();
+
+  // Mobile Menü
+  var menuBtn = document.getElementById('menuBtn');
+  var mobileMenu = document.getElementById('mobileMenu');
+  function setMenu(open) {
+    mobileMenu.classList.toggle('hidden', !open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    menuBtn.setAttribute('aria-label', open ? 'Menü schliessen' : 'Menü öffnen');
+    menuBtn.innerHTML = '<i data-lucide="' + (open ? 'x' : 'menu') + '" class="h-5 w-5"></i>';
+    icons();
+  }
+  menuBtn.addEventListener('click', function () { setMenu(mobileMenu.classList.contains('hidden')); });
+  document.querySelectorAll('.mobile-link').forEach(function (a) {
+    a.addEventListener('click', function () { setMenu(false); });
+  });
+
+  // Scroll-Animationen
+  var reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(function (el) { io.observe(el); });
+  } else {
+    reveals.forEach(function (el) { el.classList.add('in'); });
+  }
+
+  // Teig-Rechner
+  function fmt(g) {
+    return g < 10 ? g.toFixed(1).replace('.', ',') : String(Math.round(g));
+  }
+  var modes = {
+    pizza: {
+      label: 'Pizza',
+      inputs: [
+        { id: 'n', label: 'Anzahl Pizzen', min: 1, max: 12, step: 1, val: 4, unit: '' },
+        { id: 'w', label: 'Gewicht pro Teigballen', min: 180, max: 330, step: 10, val: 250, unit: ' g' },
+        { id: 'h', label: 'Hydration', min: 55, max: 75, step: 1, val: 62, unit: ' %' },
+        { id: 't', label: 'Gärzeit', seg: [['8', '8 h'], ['24', '24 h'], ['48', '48 h']], val: '24' }
+      ],
+      calc: function (v) {
+        var yeast = { '8': 1.0, '24': 0.3, '48': 0.1 }[v.t];
+        var salt = 2.8;
+        var total = v.n * v.w;
+        var flour = total / ((100 + v.h + salt + yeast) / 100);
+        var notes = {
+          '8': '8 Stunden bei Raumtemperatur (ca. 22 Grad) gehen lassen.',
+          '24': 'Rund 2 Stunden bei Raumtemperatur, danach 22 Stunden im Kühlschrank.',
+          '48': 'Rund 2 Stunden bei Raumtemperatur, danach 46 Stunden im Kühlschrank.'
+        };
+        return {
+          rows: [['Mehl (Type 00 oder 550)', flour], ['Wasser', flour * v.h / 100], ['Salz', flour * salt / 100], ['Frischhefe', flour * yeast / 100]],
+          total: total, note: notes[v.t]
+        };
+      }
+    },
+    sauer: {
+      label: 'Sauerteig',
+      inputs: [
+        { id: 'f', label: 'Mehl gesamt', min: 300, max: 1000, step: 50, val: 500, unit: ' g' },
+        { id: 'h', label: 'Hydration', min: 65, max: 90, step: 1, val: 75, unit: ' %' },
+        { id: 'a', label: 'Anstellgut', min: 5, max: 30, step: 1, val: 20, unit: ' %' }
+      ],
+      calc: function (v) {
+        var s = v.f * v.a / 100;
+        var salt = 2;
+        return {
+          rows: [['Anstellgut (100 % Hydration)', s], ['Mehl', v.f - s / 2], ['Wasser', v.f * v.h / 100 - s / 2], ['Salz', v.f * salt / 100]],
+          total: v.f + v.f * v.h / 100 + v.f * salt / 100,
+          note: 'Mehl und Wasser sind bereits um den Anteil im Anstellgut reduziert. Gesamt-Hydration: ' + v.h + ' %.'
+        };
+      }
+    },
+    focaccia: {
+      label: 'Focaccia',
+      inputs: [
+        { id: 'f', label: 'Mehl gesamt', min: 300, max: 1000, step: 50, val: 500, unit: ' g' },
+        { id: 'h', label: 'Hydration', min: 65, max: 85, step: 1, val: 75, unit: ' %' }
+      ],
+      calc: function (v) {
+        var salt = 2.2, oil = 5, yeast = 0.4;
+        return {
+          rows: [['Mehl (Type 550)', v.f], ['Wasser', v.f * v.h / 100], ['Olivenöl', v.f * oil / 100], ['Salz', v.f * salt / 100], ['Frischhefe', v.f * yeast / 100]],
+          total: v.f * (100 + v.h + oil + salt + yeast) / 100,
+          note: 'Dehnen und falten, 12 Stunden im Kühlschrank ruhen lassen, im Blech nochmals 1 bis 2 Stunden gehen lassen.'
+        };
+      }
+    }
+  };
+
+  var state = {};
+  Object.keys(modes).forEach(function (k) {
+    state[k] = {};
+    modes[k].inputs.forEach(function (i) { state[k][i.id] = i.val; });
+  });
+  var current = 'pizza';
+  var tabsEl = document.getElementById('tabs');
+  var inputsEl = document.getElementById('inputs');
+  var resultsEl = document.getElementById('results');
+  var totalEl = document.getElementById('total');
+  var noteEl = document.getElementById('note');
+
+  function renderTabs() {
+    tabsEl.innerHTML = Object.keys(modes).map(function (k) {
+      var active = k === current;
+      return '<button type="button" role="tab" aria-selected="' + active + '" data-mode="' + k + '" class="rounded-xl px-3 py-2 text-sm font-semibold transition ' +
+        (active ? 'seg-active' : 'text-stone-600 hover:text-stone-900') + '">' + modes[k].label + '</button>';
+    }).join('');
+  }
+
+  function renderInputs() {
+    var m = modes[current];
+    inputsEl.innerHTML = m.inputs.map(function (i) {
+      var v = state[current][i.id];
+      if (i.seg) {
+        return '<div><p class="text-sm font-semibold">' + i.label + '</p><div class="mt-1.5 grid grid-cols-' + i.seg.length + ' gap-1 rounded-xl bg-stone-100 p-1">' +
+          i.seg.map(function (s) {
+            return '<button type="button" data-seg="' + i.id + '" data-val="' + s[0] + '" class="rounded-lg px-3 py-1.5 text-sm font-semibold transition ' +
+              (String(v) === s[0] ? 'seg-active' : 'text-stone-600 hover:text-stone-900') + '">' + s[1] + '</button>';
+          }).join('') + '</div></div>';
+      }
+      return '<div><div class="flex items-baseline justify-between"><label for="in-' + i.id + '" class="text-sm font-semibold">' + i.label + '</label>' +
+        '<output id="out-' + i.id + '" class="font-bold text-brand-700">' + v + i.unit + '</output></div>' +
+        '<input id="in-' + i.id + '" data-range="' + i.id + '" type="range" min="' + i.min + '" max="' + i.max + '" step="' + i.step + '" value="' + v + '" class="mt-1.5 w-full"></div>';
+    }).join('');
+  }
+
+  function renderResults() {
+    var m = modes[current];
+    var r = m.calc(state[current]);
+    var max = Math.max.apply(null, r.rows.map(function (x) { return x[1]; }));
+    resultsEl.innerHTML = r.rows.map(function (x, idx) {
+      var pct = Math.max(2, (x[1] / max) * 100);
+      var shade = ['bg-brand-600', 'bg-brand-400', 'bg-brand-300', 'bg-brand-200', 'bg-brand-100'][Math.min(idx, 4)];
+      return '<div><div class="flex items-baseline justify-between text-sm"><span class="font-medium text-stone-700">' + x[0] + '</span>' +
+        '<span class="font-bold tabular-nums">' + fmt(x[1]) + ' g</span></div>' +
+        '<div class="mt-1 h-2 rounded-full bg-stone-200/70"><div class="bar h-2 rounded-full ' + shade + '" style="width:' + pct + '%"></div></div></div>';
+    }).join('');
+    totalEl.textContent = Math.round(r.total) + ' g';
+    noteEl.textContent = r.note;
+    return r;
+  }
+
+  tabsEl.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-mode]');
+    if (!b) return;
+    current = b.getAttribute('data-mode');
+    renderTabs(); renderInputs(); renderResults();
+  });
+  inputsEl.addEventListener('input', function (e) {
+    var id = e.target.getAttribute('data-range');
+    if (!id) return;
+    var def = modes[current].inputs.filter(function (i) { return i.id === id; })[0];
+    state[current][id] = Number(e.target.value);
+    document.getElementById('out-' + id).textContent = e.target.value + def.unit;
+    renderResults();
+  });
+  inputsEl.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-seg]');
+    if (!b) return;
+    state[current][b.getAttribute('data-seg')] = b.getAttribute('data-val');
+    renderInputs(); renderResults();
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    var m = modes[current];
+    var r = m.calc(state[current]);
+    var text = m.label + '-Teig\n' + r.rows.map(function (x) { return x[0] + ': ' + fmt(x[1]) + ' g'; }).join('\n') + '\nGesamt: ' + Math.round(r.total) + ' g';
+    var label = document.getElementById('copyLabel');
+    function done(msg) { label.textContent = msg; setTimeout(function () { label.textContent = 'Kopieren'; }, 1800); }
+    try {
+      navigator.clipboard.writeText(text).then(function () { done('Kopiert'); }, function () { done('Nicht möglich'); });
+    } catch (err) { done('Nicht möglich'); }
+  });
+
+  renderTabs(); renderInputs(); renderResults();
+
+  // FAQ-Akkordeon
+  document.querySelectorAll('.faq-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = btn.closest('.faq-item');
+      var panel = item.querySelector('.faq-panel');
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      document.querySelectorAll('.faq-item').forEach(function (o) {
+        o.querySelector('.faq-btn').setAttribute('aria-expanded', 'false');
+        o.querySelector('.faq-panel').classList.replace('grid-rows-[1fr]', 'grid-rows-[0fr]');
+        o.querySelector('.faq-icon').style.transform = '';
+      });
+      if (!open) {
+        btn.setAttribute('aria-expanded', 'true');
+        panel.classList.replace('grid-rows-[0fr]', 'grid-rows-[1fr]');
+        item.querySelector('.faq-icon').style.transform = 'rotate(180deg)';
+      }
+    });
+  });
+
+  // Kontaktformular
+  var form = document.getElementById('contactForm');
+  var success = document.getElementById('formSuccess');
+  function setErr(id, bad) {
+    var f = document.getElementById(id).closest('.field');
+    f.classList.toggle('has-error', bad);
+    document.getElementById(id).setAttribute('aria-invalid', String(bad));
+    return bad;
+  }
+  function validate() {
+    var name = form.name.value.trim();
+    var mail = form.email.value.trim();
+    var msg = form.message.value.trim();
+    var e1 = setErr('name', name.length < 2);
+    var e2 = setErr('email', !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail));
+    var e3 = setErr('message', msg.length < 10);
+    return !(e1 || e2 || e3);
+  }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!validate()) return;
+    form.classList.add('hidden');
+    success.classList.remove('hidden');
+    icons();
+  });
+  ['name', 'email', 'message'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', function () {
+      if (this.closest('.field').classList.contains('has-error')) validate();
+    });
+  });
+  document.getElementById('formReset').addEventListener('click', function () {
+    form.reset();
+    success.classList.add('hidden');
+    form.classList.remove('hidden');
+  });
+
+  // Modals
+  var lastFocus = null;
+  function openModal(id) {
+    var m = document.getElementById('modal-' + id);
+    lastFocus = document.activeElement;
+    m.classList.remove('hidden'); m.classList.add('flex');
+    document.body.classList.add('modal-open');
+    m.querySelector('.close-modal').focus();
+  }
+  function closeModals() {
+    document.querySelectorAll('.modal').forEach(function (m) { m.classList.add('hidden'); m.classList.remove('flex'); });
+    document.body.classList.remove('modal-open');
+    if (lastFocus) lastFocus.focus();
+  }
+  document.querySelectorAll('.open-modal').forEach(function (b) {
+    b.addEventListener('click', function () { openModal(b.getAttribute('data-modal')); });
+  });
+  document.querySelectorAll('.close-modal').forEach(function (b) { b.addEventListener('click', closeModals); });
+  document.querySelectorAll('.modal').forEach(function (m) {
+    m.addEventListener('click', function (e) { if (e.target === m) closeModals(); });
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModals(); });
+})();
+</script>
+</body>
+</html>
