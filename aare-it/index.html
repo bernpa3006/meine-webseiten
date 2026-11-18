@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aare IT | Helpdesk und IT-Support in Bern</title>
+<meta name="description" content="Aare IT betreut KMU in Bern: Helpdesk mit schneller Reaktionszeit, Terminbuchung online und IT-Support aus einer Hand.">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          display: ['"Space Grotesk"', 'Inter', 'sans-serif']
+        }
+      }
+    }
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+  body { -webkit-font-smoothing: antialiased; }
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  .mesh-light {
+    background:
+      radial-gradient(60% 50% at 85% 0%, rgba(0,0,0,.07), transparent 70%),
+      radial-gradient(50% 40% at 0% 30%, rgba(0,0,0,.04), transparent 70%);
+  }
+  .glow-dark {
+    background:
+      radial-gradient(50% 60% at 80% 0%, rgba(255,255,255,.12), transparent 70%),
+      radial-gradient(40% 50% at 0% 100%, rgba(255,255,255,.07), transparent 70%);
+  }
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, rgba(0,0,0,.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,0,0,.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(ellipse at 70% 30%, #000 20%, transparent 70%);
+            mask-image: radial-gradient(ellipse at 70% 30%, #000 20%, transparent 70%);
+  }
+  .faq-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+  .faq-panel.open { grid-template-rows: 1fr; }
+  .faq-panel > div { overflow: hidden; }
+  .chip { transition: all .15s ease; }
+  .chip[aria-pressed="true"] { background: #0a0a0a; color: #fff; border-color: #0a0a0a; }
+  .chip:disabled { opacity: .35; cursor: not-allowed; text-decoration: line-through; }
+  .dark-field { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.14); color: #fff; }
+  .dark-field::placeholder { color: rgba(255,255,255,.4); }
+  .dark-field:focus { outline: none; border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.15); }
+  .dark-field.invalid { border-color: #fca5a5; }
+  .dark-chip { border: 1px solid rgba(255,255,255,.2); color: rgba(255,255,255,.85); }
+  .dark-chip[aria-pressed="true"] { background: #fff; color: #0a0a0a; border-color: #fff; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+</head>
+<body class="bg-white font-sans text-neutral-900">
+
+<!-- 1. NAVIGATION -->
+<header class="fixed inset-x-0 top-0 z-50 border-b border-neutral-200/80 bg-white/75 backdrop-blur-xl">
+  <nav class="mx-auto flex h-16 max-w-6xl items-center justify-between px-5" aria-label="Hauptnavigation">
+    <a href="#top" class="flex items-center gap-2.5" aria-label="Aare IT Startseite">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="9" fill="#0a0a0a"/>
+        <path d="M7 22c3.5 0 4-9 9-9s5.500 9 9 9" stroke="#fff" stroke-width="2.600" stroke-linecap="round"/>
+        <circle cx="16" cy="9" r="1.800" fill="#fff"/>
+      </svg>
+      <span class="font-display text-lg font-semibold tracking-tight">Aare IT</span>
+    </a>
+    <ul class="hidden items-center gap-8 text-sm font-medium text-neutral-600 md:flex">
+      <li><a class="transition hover:text-black" href="#leistungen">Leistungen</a></li>
+      <li><a class="transition hover:text-black" href="#ablauf">Ablauf</a></li>
+      <li><a class="transition hover:text-black" href="#preise">Preise</a></li>
+      <li><a class="transition hover:text-black" href="#kontakt">Kontakt</a></li>
+    </ul>
+    <div class="flex items-center gap-2">
+      <a href="#kontakt" data-pick="termin" class="hidden rounded-full bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-neutral-700 sm:inline-flex">Termin buchen</a>
+      <button id="menuBtn" class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 md:hidden" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobileMenu">
+        <i data-lucide="menu" class="h-5 w-5" id="menuIcon"></i>
+      </button>
+    </div>
+  </nav>
+  <div id="mobileMenu" class="hidden border-t border-neutral-200 bg-white md:hidden">
+    <ul class="mx-auto max-w-6xl space-y-1 px-5 py-4 text-base font-medium">
+      <li><a class="block rounded-xl px-3 py-3 hover:bg-neutral-100" href="#leistungen">Leistungen</a></li>
+      <li><a class="block rounded-xl px-3 py-3 hover:bg-neutral-100" href="#ablauf">Ablauf</a></li>
+      <li><a class="block rounded-xl px-3 py-3 hover:bg-neutral-100" href="#preise">Preise</a></li>
+      <li><a class="block rounded-xl px-3 py-3 hover:bg-neutral-100" href="#kontakt">Kontakt</a></li>
+      <li class="pt-2"><a href="#kontakt" data-pick="termin" class="block rounded-full bg-black px-4 py-3 text-center font-semibold text-white">Termin buchen</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- 2. HERO -->
+<section class="mesh-light relative overflow-hidden pt-28 pb-16 sm:pt-36 sm:pb-24">
+  <div class="grid-lines pointer-events-none absolute inset-0"></div>
+  <div class="relative mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-[1.1fr_1fr]">
+    <div>
+      <span class="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 shadow-sm">
+        <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-black opacity-40"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-black"></span></span>
+        Helpdesk aktuell besetzt, Reaktion in unter 30 Minuten
+      </span>
+      <h1 class="mt-6 font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
+        IT, die einfach läuft.<br><span class="text-neutral-400">Mitten in Bern.</span>
+      </h1>
+      <p class="mt-6 max-w-xl text-lg leading-relaxed text-neutral-600">
+        Aare IT ist der Helpdesk für Bernerinnen und Berner KMU. Du meldest ein Problem, wir lösen es. Und wenn du lieber persönlich sprichst, buchst du in 30 Sekunden einen Termin.
+      </p>
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+        <a href="#kontakt" data-pick="termin" class="inline-flex items-center justify-center gap-2 rounded-full bg-black px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-neutral-700">
+          Termin buchen <i data-lucide="arrow-right" class="h-4 w-4"></i>
+        </a>
+        <a href="#kontakt" data-pick="ticket" class="inline-flex items-center justify-center gap-2 rounded-full border border-neutral-300 bg-white px-6 py-3.5 text-sm font-semibold transition hover:border-black">
+          <i data-lucide="life-buoy" class="h-4 w-4"></i> Helpdesk-Ticket öffnen
+        </a>
+      </div>
+      <p class="mt-6 flex items-center gap-2 text-sm text-neutral-500"><i data-lucide="map-pin" class="h-4 w-4"></i> Laupenstrasse 20, 3008 Bern, 5 Minuten vom Hauptbahnhof</p>
+    </div>
+
+    <!-- Interaktive Vorschaukarte -->
+    <div class="relative">
+      <div class="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-neutral-200/70 to-transparent blur-2xl"></div>
+      <div class="relative rounded-3xl border border-neutral-200/80 bg-white p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,.25)] sm:p-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2 text-sm font-semibold"><i data-lucide="ticket" class="h-4 w-4"></i> Ticket #4821</div>
+          <span class="rounded-full bg-black px-2.5 py-1 text-[11px] font-semibold text-white">Gelöst in 12 Min.</span>
+        </div>
+        <p class="mt-3 text-sm text-neutral-600">Outlook synchronisiert keine neuen Mails mehr. Profil neu aufgebaut, Postfach geprüft, Rückmeldung an Sandra K.</p>
+        <div class="mt-4 h-1.5 overflow-hidden rounded-full bg-neutral-100"><div class="h-full w-full rounded-full bg-black"></div></div>
+
+        <div class="mt-6 border-t border-neutral-100 pt-5">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold">Nächster freier Termin</p>
+            <span class="text-xs text-neutral-500">Vor Ort oder per Video</span>
+          </div>
+          <div id="heroDays" class="mt-3 flex gap-2 overflow-x-auto pb-1"></div>
+          <div id="heroSlots" class="mt-3 grid grid-cols-4 gap-2"></div>
+          <a id="heroCta" href="#kontakt" data-pick="termin" class="mt-4 flex items-center justify-center gap-2 rounded-xl bg-black py-3 text-sm font-semibold text-white transition hover:bg-neutral-700">
+            <i data-lucide="calendar-check" class="h-4 w-4"></i> <span id="heroCtaText">Termin wählen</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. TRUST BAR -->
+<section class="border-y border-neutral-200 bg-neutral-50" aria-label="Kennzahlen">
+  <div class="mx-auto grid max-w-6xl grid-cols-2 gap-y-8 px-5 py-10 lg:grid-cols-4">
+    <div class="reveal"><p class="font-display text-3xl font-semibold sm:text-4xl">&lt; 30 Min.</p><p class="mt-1 text-sm text-neutral-600">Reaktionszeit im Helpdesk</p></div>
+    <div class="reveal"><p class="font-display text-3xl font-semibold sm:text-4xl">94 %</p><p class="mt-1 text-sm text-neutral-600">Gelöst im ersten Kontakt</p></div>
+    <div class="reveal"><p class="font-display text-3xl font-semibold sm:text-4xl">120+</p><p class="mt-1 text-sm text-neutral-600">Betreute Firmen im Raum Bern</p></div>
+    <div class="reveal"><p class="font-display text-3xl font-semibold sm:text-4xl">15 Jahre</p><p class="mt-1 text-sm text-neutral-600">Erfahrung im IT-Betrieb</p></div>
+  </div>
+</section>
+
+<!-- 4. LEISTUNGEN (BENTO) -->
+<section id="leistungen" class="mx-auto max-w-6xl px-5 py-20 sm:py-28">
+  <div class="max-w-2xl reveal">
+    <p class="text-sm font-semibold uppercase tracking-widest text-neutral-500">Leistungen</p>
+    <h2 class="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-5xl">Alles, was dein Team täglich braucht.</h2>
+    <p class="mt-4 text-lg text-neutral-600">Fünf Bereiche, ein Ansprechpartner. Keine Warteschleife, keine Ticketnummern ohne Antwort.</p>
+  </div>
+
+  <div class="mt-12 grid gap-4 lg:grid-cols-6">
+    <article class="reveal rounded-3xl border border-neutral-200/80 bg-neutral-950 p-7 text-white lg:col-span-4">
+      <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10"><i data-lucide="headset" class="h-5 w-5"></i></div>
+      <h3 class="mt-5 font-display text-2xl font-semibold">Helpdesk</h3>
+      <p class="mt-2 max-w-md text-neutral-300">Ein Anruf, eine Mail oder ein Ticket über das Formular. Wir melden uns schnell, lösen per Fernzugriff oder kommen vorbei.</p>
+      <ul class="mt-6 grid gap-2 text-sm text-neutral-200 sm:grid-cols-2">
+        <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4"></i> Fernwartung in Minuten</li>
+        <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4"></i> Persönliche Ansprechperson</li>
+        <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4"></i> Mo bis Fr, 07:30 bis 17:30</li>
+        <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4"></i> Transparenter Ticketverlauf</li>
+      </ul>
+    </article>
+
+    <article class="reveal rounded-3xl border border-neutral-200/80 bg-white p-7 lg:col-span-2">
+      <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100"><i data-lucide="calendar-clock" class="h-5 w-5"></i></div>
+      <h3 class="mt-5 font-display text-xl font-semibold">Terminbuchung</h3>
+      <p class="mt-2 text-neutral-600">Freie Zeiten live sehen, Slot wählen, fertig. Du erhältst sofort eine Bestätigung.</p>
+    </article>
+
+    <article class="reveal rounded-3xl border border-neutral-200/80 bg-white p-7 lg:col-span-2">
+      <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100"><i data-lucide="layout-grid" class="h-5 w-5"></i></div>
+      <h3 class="mt-5 font-display text-xl font-semibold">Microsoft 365</h3>
+      <p class="mt-2 text-neutral-600">Lizenzen, Teams, SharePoint und Mailmigration, sauber eingerichtet und dokumentiert.</p>
+    </article>
+
+    <article class="reveal rounded-3xl border border-neutral-200/80 bg-white p-7 lg:col-span-2">
+      <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100"><i data-lucide="wifi" class="h-5 w-5"></i></div>
+      <h3 class="mt-5 font-display text-xl font-semibold">Netzwerk und WLAN</h3>
+      <p class="mt-2 text-neutral-600">Stabiles WLAN im ganzen Büro, Firewall, VPN und Home-Office-Anbindung.</p>
+    </article>
+
+    <article class="reveal rounded-3xl border border-neutral-200/80 bg-white p-7 lg:col-span-2">
+      <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100"><i data-lucide="shield-check" class="h-5 w-5"></i></div>
+      <h3 class="mt-5 font-display text-xl font-semibold">Sicherheit und Backup</h3>
+      <p class="mt-2 text-neutral-600">Schweizer Backup-Standort, Virenschutz, Patch-Management und Schulung für dein Team.</p>
+    </article>
+  </div>
+</section>
+
+<!-- 5. ABLAUF -->
+<section id="ablauf" class="border-y border-neutral-200 bg-neutral-50 py-20 sm:py-28">
+  <div class="mx-auto max-w-6xl px-5">
+    <div class="max-w-2xl reveal">
+      <p class="text-sm font-semibold uppercase tracking-widest text-neutral-500">Ablauf</p>
+      <h2 class="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-5xl">In drei Schritten zur Lösung.</h2>
+    </div>
+    <ol class="mt-12 grid gap-4 md:grid-cols-3">
+      <li class="reveal rounded-3xl border border-neutral-200/80 bg-white p-7">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-black font-display text-sm font-semibold text-white">1</span>
+        <h3 class="mt-5 font-display text-xl font-semibold">Melden</h3>
+        <p class="mt-2 text-neutral-600">Ticket öffnen oder Termin wählen. Zwei Minuten, ohne Konto und ohne Anmeldung.</p>
+      </li>
+      <li class="reveal rounded-3xl border border-neutral-200/80 bg-white p-7">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-black font-display text-sm font-semibold text-white">2</span>
+        <h3 class="mt-5 font-display text-xl font-semibold">Einschätzen</h3>
+        <p class="mt-2 text-neutral-600">Wir melden uns innert 30 Minuten, klären das Problem und nennen dir Aufwand und Preis vorab.</p>
+      </li>
+      <li class="reveal rounded-3xl border border-neutral-200/80 bg-white p-7">
+        <span class="flex h-10 w-10 items-center justify-center rounded-full bg-black font-display text-sm font-semibold text-white">3</span>
+        <h3 class="mt-5 font-display text-xl font-semibold">Lösen</h3>
+        <p class="mt-2 text-neutral-600">Per Fernzugriff oder vor Ort. Danach erhältst du eine kurze Zusammenfassung, was wir getan haben.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- 6. PREISE -->
+<section id="preise" class="mx-auto max-w-6xl px-5 py-20 sm:py-28">
+  <div class="max-w-2xl reveal">
+    <p class="text-sm font-semibold uppercase tracking-widest text-neutral-500">Preise</p>
+    <h2 class="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-5xl">Klare Preise in CHF.</h2>
+    <p class="mt-4 text-lg text-neutral-600">Alle Preise exklusive MWST. Monatlich kündbar, keine Einrichtungsgebühr.</p>
+  </div>
+
+  <div class="mt-12 grid items-stretch gap-4 md:grid-cols-3">
+    <article class="reveal flex flex-col rounded-3xl border border-neutral-200/80 bg-white p-7">
+      <h3 class="font-display text-xl font-semibold">Einzeleinsatz</h3>
+      <p class="mt-1 text-sm text-neutral-500">Für gelegentliche Probleme</p>
+      <p class="mt-6"><span class="font-display text-4xl font-semibold">CHF 140</span> <span class="text-neutral-500">/ Stunde</span></p>
+      <ul class="mt-6 space-y-3 text-sm text-neutral-700">
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0"></i> Helpdesk per Telefon und Mail</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0"></i> Fernwartung ohne Anfahrt</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0"></i> Einsatz vor Ort in Bern ab CHF 40 Pauschale</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0"></i> Abrechnung im 15-Minuten-Takt</li>
+      </ul>
+      <a href="#kontakt" data-pick="termin" class="mt-8 inline-flex items-center justify-center rounded-full border border-neutral-300 px-5 py-3 text-sm font-semibold transition hover:border-black">Termin buchen</a>
+    </article>
+
+    <article class="reveal relative flex flex-col rounded-3xl border border-black bg-neutral-950 p-7 text-white shadow-[0_30px_60px_-25px_rgba(0,0,0,.5)] md:-my-3">
+      <span class="absolute -top-3 left-7 rounded-full bg-white px-3 py-1 text-xs font-semibold text-black">Beliebt</span>
+      <h3 class="font-display text-xl font-semibold">Support-Abo</h3>
+      <p class="mt-1 text-sm text-neutral-400">Für Teams bis 10 Personen</p>
+      <p class="mt-6"><span class="font-display text-4xl font-semibold">CHF 249</span> <span class="text-neutral-400">/ Monat</span></p>
+      <ul class="mt-6 space-y-3 text-sm text-neutral-200">
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0"></i> Helpdesk unbegrenzt, Antwort in 30 Minuten</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0"></i> 2 Stunden Vor-Ort-Support inklusive</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0"></i> Monitoring und Updates aller Geräte</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0"></i> Cloud-Backup mit Standort Schweiz</li>
+      </ul>
+      <a href="#kontakt" data-pick="termin" class="mt-8 inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-neutral-200">Beratung buchen</a>
+    </article>
+
+    <article class="reveal flex flex-col rounded-3xl border border-neutral-200/80 bg-white p-7">
+      <h3 class="font-display text-xl font-semibold">Rundum-IT</h3>
+      <p class="mt-1 text-sm text-neutral-500">Für wachsende Firmen</p>
+      <p class="mt-6"><span class="font-display text-4xl font-semibold">ab CHF 690</span> <span class="text-neutral-500">/ Monat</span></p>
+      <ul class="mt-6 space-y-3 text-sm text-neutral-700">
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0"></i> Alles aus dem Support-Abo</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0"></i> Feste Ansprechperson und Quartalsgespräch</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0"></i> Beschaffung von Hardware und Lizenzen</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0"></i> Onboarding neuer Mitarbeitender</li>
+      </ul>
+      <a href="#kontakt" data-pick="frage" class="mt-8 inline-flex items-center justify-center rounded-full border border-neutral-300 px-5 py-3 text-sm font-semibold transition hover:border-black">Offerte anfragen</a>
+    </article>
+  </div>
+</section>
+
+<!-- 7. KUNDENSTIMMEN -->
+<section class="border-y border-neutral-200 bg-neutral-50 py-20 sm:py-28">
+  <div class="mx-auto max-w-6xl px-5">
+    <div class="max-w-2xl reveal">
+      <p class="text-sm font-semibold uppercase tracking-widest text-neutral-500">Kundenstimmen</p>
+      <h2 class="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-5xl">Was Berner Teams sagen.</h2>
+    </div>
+    <div class="mt-12 grid gap-4 md:grid-cols-3">
+      <figure class="reveal rounded-3xl border border-neutral-200/80 bg-white p-7">
+        <div class="flex gap-0.5" aria-label="5 von 5 Sternen"><i data-lucide="star" class="h-4 w-4 fill-black"></i><i data-lucide="star" class="h-4 w-4 fill-black"></i><i data-lucide="star" class="h-4 w-4 fill-black"></i><i data-lucide="star" class="h-4 w-4 fill-black"></i><i data-lucide="star" class="h-4 w-4 fill-black"></i></div>
+        <blockquote class="mt-4 text-neutral-800">Früher habe ich tagelang auf Rückmeldungen gewartet. Bei Aare IT ist das Problem meist gelöst, bevor mein Kaffee kalt ist.</blockquote>
+        <figcaption class="mt-6 text-sm"><span class="font-semibold">Sandra Küng</span><br><span class="text-neutral-500">Praxismanagerin, Zahnarztpraxis Länggasse</span></figcaption>
+      </figure>
+      <figure class="reveal rounded-3xl border border-neutral-200/80 bg-white p-7">
+        <div class="flex gap-0.5" aria-label="5 von 5 Sternen"><i data-lucide="star" class="h-4 w-4 fill-black"></i><i data-lucide="star" class="h-4 w-4 fill-black"></i><i data-lucide="star" class="h-4 w-4 fill-black"></i><i data-lucide="star" class="h-4 w-4 fill-black"></i><i data-lucide="star" class="h-4 w-4 fill-black"></i></div>
+        <blockquote class="mt-4 text-neutral-800">Die Terminbuchung ist ein Traum. Slot wählen, Bestätigung erhalten, und am Tag selbst steht jemand pünktlich vor der Tür.</blockquote>
+        <figcaption class="mt-6 text-sm"><span class="font-semibold">Marco Rüegg</span><br><span class="text-neutral-500">Inhaber, Architekturbüro Rüegg und Partner</span></figcaption>
+      </figure>
+      <figure class="reveal rounded-3xl border border-neutral-200/80 bg-white p-7">
+        <div class="flex gap-0.5" aria-label="5 von 5 Sternen"><i data-lucide="star" class="h-4 w-4 fill-black"></i><i data-lucide="star" class="h-4 w-4 fill-black"></i><i data-lucide="star" class="h-4 w-4 fill-black"></i><i data-lucide="star" class="h-4 w-4 fill-black"></i><i data-lucide="star" class="h-4 w-4 fill-black"></i></div>
+        <blockquote class="mt-4 text-neutral-800">Migration auf Microsoft 365 an einem Wochenende, ohne dass jemand am Montag etwas gemerkt hat. Genau so stellen wir uns das vor.</blockquote>
+        <figcaption class="mt-6 text-sm"><span class="font-semibold">Nadine Zbinden</span><br><span class="text-neutral-500">Geschäftsleiterin, Treuhand Zbinden AG</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 8. FAQ -->
+<section id="faq" class="mx-auto max-w-3xl px-5 py-20 sm:py-28">
+  <div class="reveal">
+    <p class="text-sm font-semibold uppercase tracking-widest text-neutral-500">FAQ</p>
+    <h2 class="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-5xl">Häufige Fragen.</h2>
+  </div>
+  <div id="faqList" class="mt-10 divide-y divide-neutral-200 border-y border-neutral-200">
+    <div>
+      <button class="faq-btn flex w-full items-center justify-between gap-4 py-5 text-left font-medium" aria-expanded="false">
+        Wie schnell erhalte ich Hilfe?
+        <i data-lucide="plus" class="h-5 w-5 shrink-0 transition-transform"></i>
+      </button>
+      <div class="faq-panel"><div><p class="pb-5 text-neutral-600">Tickets und Anrufe während der Supportzeiten beantworten wir in der Regel innert 30 Minuten. Die Supportzeiten sind Montag bis Freitag, 07:30 bis 17:30 Uhr. Dringende Ausfälle haben Vorrang.</p></div></div>
+    </div>
+    <div>
+      <button class="faq-btn flex w-full items-center justify-between gap-4 py-5 text-left font-medium" aria-expanded="false">
+        Kommt ihr auch vor Ort?
+        <i data-lucide="plus" class="h-5 w-5 shrink-0 transition-transform"></i>
+      </button>
+      <div class="faq-panel"><div><p class="pb-5 text-neutral-600">Ja, in der Stadt Bern und der Agglomeration. Viele Probleme lösen wir aber schneller per Fernzugriff. Du entscheidest bei der Terminbuchung, ob du Vor-Ort oder Video möchtest.</p></div></div>
+    </div>
+    <div>
+      <button class="faq-btn flex w-full items-center justify-between gap-4 py-5 text-left font-medium" aria-expanded="false">
+        Wie funktioniert die Terminbuchung?
+        <i data-lucide="plus" class="h-5 w-5 shrink-0 transition-transform"></i>
+      </button>
+      <div class="faq-panel"><div><p class="pb-5 text-neutral-600">Im Kontaktbereich wählst du Tag und Uhrzeit aus den freien Slots, gibst Name und Mailadresse an und sendest die Anfrage ab. Du erhältst eine Bestätigung. Umbuchen ist bis 24 Stunden vorher kostenlos.</p></div></div>
+    </div>
+    <div>
+      <button class="faq-btn flex w-full items-center justify-between gap-4 py-5 text-left font-medium" aria-expanded="false">
+        Gibt es eine Mindestvertragsdauer?
+        <i data-lucide="plus" class="h-5 w-5 shrink-0 transition-transform"></i>
+      </button>
+      <div class="faq-panel"><div><p class="pb-5 text-neutral-600">Nein. Das Support-Abo und Rundum-IT sind monatlich kündbar. Den Einzeleinsatz zahlst du nur, wenn du ihn brauchst.</p></div></div>
+    </div>
+    <div>
+      <button class="faq-btn flex w-full items-center justify-between gap-4 py-5 text-left font-medium" aria-expanded="false">
+        Wo liegen meine Daten?
+        <i data-lucide="plus" class="h-5 w-5 shrink-0 transition-transform"></i>
+      </button>
+      <div class="faq-panel"><div><p class="pb-5 text-neutral-600">Backups legen wir bei einem Anbieter mit Rechenzentrum in der Schweiz ab, verschlüsselt und mit regelmässigen Wiederherstellungstests. Zugriffe auf deine Systeme protokollieren wir nachvollziehbar.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. KONTAKT -->
+<section id="kontakt" class="glow-dark relative overflow-hidden bg-neutral-950 py-20 text-white sm:py-28">
+  <div class="relative mx-auto grid max-w-6xl gap-12 px-5 lg:grid-cols-[0.9fr_1.1fr]">
+    <div class="reveal">
+      <p class="text-sm font-semibold uppercase tracking-widest text-neutral-400">Kontakt</p>
+      <h2 class="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-5xl">Sag uns, was nicht läuft.</h2>
+      <p class="mt-4 max-w-md text-lg text-neutral-300">Ticket öffnen, Termin buchen oder einfach eine Frage stellen. Wir antworten werktags innert 30 Minuten.</p>
+      <ul class="mt-8 space-y-4 text-neutral-200">
+        <li class="flex items-start gap-3"><i data-lucide="phone" class="mt-0.5 h-5 w-5 shrink-0"></i><span>+41 31 555 01 20<br><span class="text-sm text-neutral-400">Mo bis Fr, 07:30 bis 17:30</span></span></li>
+        <li class="flex items-start gap-3"><i data-lucide="mail" class="mt-0.5 h-5 w-5 shrink-0"></i><span>support@aare-it.ch</span></li>
+        <li class="flex items-start gap-3"><i data-lucide="map-pin" class="mt-0.5 h-5 w-5 shrink-0"></i><span>Laupenstrasse 20<br>3008 Bern</span></li>
+      </ul>
+    </div>
+
+    <div class="reveal rounded-3xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur sm:p-8">
+      <form id="contactForm" novalidate>
+        <fieldset>
+          <legend class="text-sm font-medium text-neutral-300">Worum geht es?</legend>
+          <div class="mt-3 grid grid-cols-3 gap-2" id="typeChips">
+            <button type="button" class="dark-chip rounded-xl px-2 py-3 text-sm font-medium" data-type="termin" aria-pressed="true">Termin</button>
+            <button type="button" class="dark-chip rounded-xl px-2 py-3 text-sm font-medium" data-type="ticket" aria-pressed="false">Ticket</button>
+            <button type="button" class="dark-chip rounded-xl px-2 py-3 text-sm font-medium" data-type="frage" aria-pressed="false">Frage</button>
+          </div>
+        </fieldset>
+
+        <div id="slotBlock" class="mt-6">
+          <p class="text-sm font-medium text-neutral-300">Tag und Uhrzeit</p>
+          <div id="formDays" class="mt-3 flex gap-2 overflow-x-auto pb-1"></div>
+          <div id="formSlots" class="mt-3 grid grid-cols-4 gap-2"></div>
+          <p id="slotErr" class="mt-2 hidden text-sm text-red-300">Bitte wähle einen freien Termin.</p>
+        </div>
+
+        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label for="fName" class="text-sm font-medium text-neutral-300">Name</label>
+            <input id="fName" name="name" type="text" autocomplete="name" placeholder="Vorname Nachname" class="dark-field mt-2 w-full rounded-xl px-4 py-3 text-base">
+            <p class="err mt-1 hidden text-sm text-red-300">Bitte gib deinen Namen an.</p>
+          </div>
+          <div>
+            <label for="fMail" class="text-sm font-medium text-neutral-300">E-Mail</label>
+            <input id="fMail" name="email" type="email" autocomplete="email" placeholder="du@firma.ch" class="dark-field mt-2 w-full rounded-xl px-4 py-3 text-base">
+            <p class="err mt-1 hidden text-sm text-red-300">Bitte gib eine gültige E-Mail-Adresse an.</p>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label for="fMsg" id="msgLabel" class="text-sm font-medium text-neutral-300">Kurze Beschreibung</label>
+          <textarea id="fMsg" name="message" rows="4" placeholder="Was soll Aare IT für dich erledigen?" class="dark-field mt-2 w-full rounded-xl px-4 py-3 text-base"></textarea>
+          <p class="err mt-1 hidden text-sm text-red-300">Bitte beschreibe kurz dein Anliegen (mindestens 10 Zeichen).</p>
+        </div>
+
+        <label class="mt-4 flex items-start gap-3 text-sm text-neutral-300">
+          <input id="fConsent" type="checkbox" class="mt-1 h-4 w-4 rounded border-white/30 bg-transparent accent-white">
+          <span>Ich bin einverstanden, dass Aare IT meine Angaben zur Bearbeitung der Anfrage verwendet (<button type="button" class="underline underline-offset-2" data-modal="datenschutz">Datenschutz</button>).</span>
+        </label>
+        <p class="err mt-1 hidden text-sm text-red-300">Bitte stimme der Verarbeitung zu.</p>
+
+        <button type="submit" id="submitBtn" class="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-black transition hover:bg-neutral-200">
+          <i data-lucide="send" class="h-4 w-4"></i> <span id="submitText">Termin anfragen</span>
+        </button>
+      </form>
+
+      <div id="successBox" class="hidden py-10 text-center" role="status" aria-live="polite">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white text-black"><i data-lucide="check" class="h-7 w-7"></i></div>
+        <h3 class="mt-5 font-display text-2xl font-semibold">Danke, wir melden uns.</h3>
+        <p id="successText" class="mx-auto mt-2 max-w-sm text-neutral-300"></p>
+        <button id="resetBtn" class="mt-6 rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold transition hover:bg-white/10">Neue Anfrage</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/10 bg-neutral-950 text-neutral-400">
+  <div class="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
+    <div>
+      <div class="flex items-center gap-2.5 text-white">
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect width="32" height="32" rx="9" fill="#fff"/>
+          <path d="M7 22c3.5 0 4-9 9-9s5.500 9 9 9" stroke="#0a0a0a" stroke-width="2.600" stroke-linecap="round"/>
+          <circle cx="16" cy="9" r="1.800" fill="#0a0a0a"/>
+        </svg>
+        <span class="font-display text-lg font-semibold">Aare IT</span>
+      </div>
+      <p class="mt-4 max-w-sm text-sm leading-relaxed">Helpdesk, Terminbuchung und IT-Betrieb für KMU in Bern und Umgebung. Persönlich, schnell und verständlich.</p>
+    </div>
+    <div>
+      <p class="text-sm font-semibold text-white">Navigation</p>
+      <ul class="mt-4 space-y-2.5 text-sm">
+        <li><a class="transition hover:text-white" href="#leistungen">Leistungen</a></li>
+        <li><a class="transition hover:text-white" href="#ablauf">Ablauf</a></li>
+        <li><a class="transition hover:text-white" href="#preise">Preise</a></li>
+        <li><a class="transition hover:text-white" href="#faq">FAQ</a></li>
+        <li><a class="transition hover:text-white" href="#kontakt">Kontakt</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="text-sm font-semibold text-white">Kontakt</p>
+      <ul class="mt-4 space-y-2.5 text-sm">
+        <li>Laupenstrasse 20, 3008 Bern</li>
+        <li>+41 31 555 01 20</li>
+        <li>support@aare-it.ch</li>
+        <li>Mo bis Fr, 07:30 bis 17:30</li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-white/10">
+    <div class="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-6 text-sm sm:flex-row sm:items-center sm:justify-between">
+      <p>&copy; <span id="year">2026</span> Aare IT GmbH, Bern</p>
+      <div class="flex gap-6">
+        <button class="transition hover:text-white" data-modal="impressum">Impressum</button>
+        <button class="transition hover:text-white" data-modal="datenschutz">Datenschutz</button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- MODALS -->
+<div id="modal" class="fixed inset-0 z-[60] hidden items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-white p-6 text-neutral-800 sm:rounded-3xl sm:p-8">
+    <div class="flex items-start justify-between gap-4">
+      <h2 id="modalTitle" class="font-display text-2xl font-semibold"></h2>
+      <button id="modalClose" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-200 hover:bg-neutral-100" aria-label="Schliessen"><i data-lucide="x" class="h-5 w-5"></i></button>
+    </div>
+    <div id="modalBody" class="mt-5 space-y-4 text-sm leading-relaxed text-neutral-600"></div>
+  </div>
+</div>
+
+<template id="tpl-impressum">
+  <p><strong class="text-neutral-900">Aare IT GmbH</strong><br>Laupenstrasse 20<br>3008 Bern<br>Schweiz</p>
+  <p>Telefon: +41 31 555 01 20<br>E-Mail: support@aare-it.ch</p>
+  <p>Eintrag im Handelsregister des Kantons Bern.<br>Geschäftsführung: Aare IT GmbH, vertreten durch die Geschäftsleitung.</p>
+  <p><strong class="text-neutral-900">Haftungsausschluss</strong><br>Die Inhalte dieser Webseite werden mit grösster Sorgfalt erstellt. Für Richtigkeit, Vollständigkeit und Aktualität übernimmt Aare IT keine Gewähr. Haftungsansprüche, die sich auf Schäden aus der Nutzung der angebotenen Informationen beziehen, sind ausgeschlossen.</p>
+</template>
+<template id="tpl-datenschutz">
+  <p><strong class="text-neutral-900">Verantwortliche Stelle</strong><br>Aare IT GmbH, Laupenstrasse 20, 3008 Bern, support@aare-it.ch</p>
+  <p><strong class="text-neutral-900">Welche Daten wir verarbeiten</strong><br>Wenn du das Kontaktformular nutzt, verarbeiten wir Name, E-Mail-Adresse, deine Nachricht und, bei einer Terminanfrage, den gewünschten Zeitpunkt. Wir verwenden diese Angaben ausschliesslich, um deine Anfrage zu beantworten und den Termin zu organisieren.</p>
+  <p><strong class="text-neutral-900">Weitergabe und Speicherdauer</strong><br>Deine Daten geben wir nicht an Dritte weiter, ausser dies ist zur Erfüllung deiner Anfrage nötig. Wir löschen sie, sobald der Zweck erfüllt ist und keine gesetzlichen Aufbewahrungspflichten bestehen.</p>
+  <p><strong class="text-neutral-900">Externe Dienste</strong><br>Diese Seite lädt Schriften von Google Fonts und Symbole sowie Stilbibliotheken über öffentliche Content-Delivery-Netzwerke. Dabei kann deine IP-Adresse an die jeweiligen Anbieter übermittelt werden.</p>
+  <p><strong class="text-neutral-900">Deine Rechte</strong><br>Nach dem Schweizer Datenschutzgesetz kannst du Auskunft, Berichtigung und Löschung deiner Daten verlangen. Schreibe uns dazu an support@aare-it.ch.</p>
+</template>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  /* Footer-Jahr */
+  $('#year').textContent = new Date().getFullYear();
+
+  /* Mobiles Menü */
+  var menuBtn = $('#menuBtn'), mobileMenu = $('#mobileMenu');
+  function setMenu(open) {
+    mobileMenu.classList.toggle('hidden', !open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    menuBtn.innerHTML = '<i data-lucide="' + (open ? 'x' : 'menu') + '" class="h-5 w-5"></i>';
+    lucide.createIcons();
+  }
+  menuBtn.addEventListener('click', function () { setMenu(mobileMenu.classList.contains('hidden')); });
+  $$('#mobileMenu a').forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
+
+  /* Scroll-Animationen */
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    $$('.reveal').forEach(function (el) { io.observe(el); });
+  } else {
+    $$('.reveal').forEach(function (el) { el.classList.add('in'); });
+  }
+
+  /* FAQ */
+  $$('.faq-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var panel = btn.nextElementSibling;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      $$('.faq-btn').forEach(function (b) {
+        b.setAttribute('aria-expanded', 'false');
+        b.nextElementSibling.classList.remove('open');
+        b.querySelector('svg, i').style.transform = '';
+      });
+      if (!open) {
+        btn.setAttribute('aria-expanded', 'true');
+        panel.classList.add('open');
+        btn.querySelector('svg, i').style.transform = 'rotate(45deg)';
+      }
+    });
+  });
+
+  /* Terminlogik: nächste 5 Werktage, feste Zeitfenster */
+  var DAY = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+  var TIMES = ['08:30', '10:00', '13:30', '15:00'];
+  var days = [];
+  (function () {
+    var d = new Date();
+    d.setHours(12, 0, 0, 0);
+    if (d.getHours() >= 16) d.setDate(d.getDate() + 1);
+    while (days.length < 5) {
+      d.setDate(d.getDate() + 1);
+      var w = d.getDay();
+      if (w !== 0 && w !== 6) {
+        days.push({
+          label: DAY[w] + ' ' + String(d.getDate()).padStart(2, '0') + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.',
+          long: DAY[w] + ', ' + String(d.getDate()).padStart(2, '0') + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear()
+        });
+      }
+    }
+  })();
+  function taken(di, ti) { return (di * 3 + ti * 2) % 5 === 0; }
+
+  var state = { day: 0, time: null, type: 'termin' };
+
+  function renderPicker(daysEl, slotsEl, dark) {
+    daysEl.innerHTML = '';
+    slotsEl.innerHTML = '';
+    days.forEach(function (d, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = d.label;
+      b.setAttribute('aria-pressed', String(state.day === i));
+      b.className = (dark ? 'dark-chip' : 'chip border border-neutral-200') + ' shrink-0 rounded-xl px-3.5 py-2 text-sm font-medium';
+      b.addEventListener('click', function () { state.day = i; state.time = null; renderAll(); });
+      daysEl.appendChild(b);
+    });
+    TIMES.forEach(function (t, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = t;
+      var isTaken = taken(state.day, i);
+      b.disabled = isTaken;
+      b.setAttribute('aria-pressed', String(state.time === t));
+      b.className = (dark ? 'dark-chip' : 'chip border border-neutral-200') + ' rounded-xl py-2.5 text-sm font-medium' + (dark && isTaken ? ' opacity-30 line-through' : '');
+      b.addEventListener('click', function () { state.time = t; renderAll(); });
+      slotsEl.appendChild(b);
+    });
+  }
+  function renderAll() {
+    renderPicker($('#heroDays'), $('#heroSlots'), false);
+    renderPicker($('#formDays'), $('#formSlots'), true);
+    $('#heroCtaText').textContent = state.time ? days[state.day].label + ' um ' + state.time + ' Uhr anfragen' : 'Termin wählen';
+    $('#slotErr').classList.add('hidden');
+  }
+  renderAll();
+
+  /* Anfragetyp */
+  var typeText = {
+    termin: { btn: 'Termin anfragen', label: 'Kurze Beschreibung', ph: 'Worum soll es im Termin gehen?' },
+    ticket: { btn: 'Ticket senden', label: 'Problem beschreiben', ph: 'Was funktioniert nicht? Seit wann? Welches Gerät?' },
+    frage: { btn: 'Anfrage senden', label: 'Deine Frage', ph: 'Wie können wir dir weiterhelfen?' }
+  };
+  function setType(t) {
+    state.type = t;
+    $$('#typeChips button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-type') === t)); });
+    $('#slotBlock').classList.toggle('hidden', t !== 'termin');
+    $('#submitText').textContent = typeText[t].btn;
+    $('#msgLabel').textContent = typeText[t].label;
+    $('#fMsg').placeholder = typeText[t].ph;
+  }
+  $$('#typeChips button').forEach(function (b) { b.addEventListener('click', function () { setType(b.getAttribute('data-type')); }); });
+  $$('[data-pick]').forEach(function (a) { a.addEventListener('click', function () { setType(a.getAttribute('data-pick')); }); });
+
+  /* Formular */
+  var form = $('#contactForm'), success = $('#successBox');
+  function setErr(input, show) {
+    var holder = input.type === 'checkbox' ? input.closest('label') : input.parentElement;
+    var msg = holder.nextElementSibling && holder.nextElementSibling.classList.contains('err') ? holder.nextElementSibling : holder.querySelector('.err');
+    if (msg) msg.classList.toggle('hidden', !show);
+    if (input.type !== 'checkbox') input.classList.toggle('invalid', show);
+  }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = $('#fName'), mail = $('#fMail'), msg = $('#fMsg'), consent = $('#fConsent');
+    var ok = true;
+    var checks = [
+      [name, name.value.trim().length >= 2],
+      [mail, /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail.value.trim())],
+      [msg, msg.value.trim().length >= 10],
+      [consent, consent.checked]
+    ];
+    checks.forEach(function (c) { setErr(c[0], !c[1]); if (!c[1]) ok = false; });
+    if (state.type === 'termin' && !state.time) { $('#slotErr').classList.remove('hidden'); ok = false; }
+    if (!ok) { var first = $('.invalid', form) || $('#slotErr:not(.hidden)', form); if (first) first.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+
+    var first = name.value.trim().split(' ')[0];
+    var text = state.type === 'termin'
+      ? 'Dein Terminwunsch für ' + days[state.day].long + ' um ' + state.time + ' Uhr ist eingegangen. Die Bestätigung senden wir an ' + mail.value.trim() + '.'
+      : state.type === 'ticket'
+        ? 'Dein Ticket ist eröffnet. Wir melden uns innert 30 Minuten während der Supportzeiten bei ' + mail.value.trim() + '.'
+        : 'Deine Anfrage ist eingegangen. Wir antworten werktags innert eines Arbeitstages an ' + mail.value.trim() + '.';
+    $('#successText').textContent = first + ', ' + text.charAt(0).toLowerCase() + text.slice(1);
+    form.classList.add('hidden');
+    success.classList.remove('hidden');
+    lucide.createIcons();
+  });
+  $$('#contactForm input, #contactForm textarea').forEach(function (el) {
+    el.addEventListener('input', function () { setErr(el, false); });
+    el.addEventListener('change', function () { setErr(el, false); });
+  });
+  $('#resetBtn').addEventListener('click', function () {
+    form.reset();
+    state.time = null;
+    renderAll();
+    setType('termin');
+    success.classList.add('hidden');
+    form.classList.remove('hidden');
+  });
+
+  /* Modals */
+  var modal = $('#modal');
+  var titles = { impressum: 'Impressum', datenschutz: 'Datenschutzerklärung' };
+  function openModal(key) {
+    $('#modalTitle').textContent = titles[key];
+    $('#modalBody').innerHTML = $('#tpl-' + key).innerHTML;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    $('#modalClose').focus();
+  }
+  function closeModal() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+  $$('[data-modal]').forEach(function (b) { b.addEventListener('click', function () { openModal(b.getAttribute('data-modal')); }); });
+  $('#modalClose').addEventListener('click', closeModal);
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+  lucide.createIcons();
+})();
+</script>
+</body>
+</html>
