@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Waffelwölkchen | Waffel-Rezepte, Grundteige und Zutaten</title>
+<meta name="description" content="Sechs getestete Waffel-Rezepte, drei Grundteige und ein Zutaten-Kompass. Mit Mengenrechner für jede Portionszahl.">
+<meta name="theme-color" content="#FFF7F9">
+<meta property="og:title" content="Waffelwölkchen | Waffel-Rezepte, Grundteige und Zutaten">
+<meta property="og:description" content="Vom knusprigen Klassiker bis zur veganen Beerenwaffel, mit Mengenrechner für jede Portionszahl.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%23E0457B'/%3E%3Cpath d='M10 8v16M16 8v16M22 8v16M8 12.5h16M8 19.5h16' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script>
+  document.documentElement.classList.add('js');
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          serif: ['"Playfair Display"', 'Georgia', 'serif']
+        },
+        colors: {
+          blush: { 50:'#FFF7F9', 100:'#FFEDF2', 200:'#FFD9E4', 300:'#FFB8CD', 400:'#FF8DAE', 500:'#F0538A', 600:'#C92F66', 700:'#A52252', 800:'#7E1B40' },
+          plum: { 900:'#3A1B2A', 800:'#4E2A3C', 700:'#6B4556', 600:'#85606F' },
+          lilac: { 50:'#F8F3FF', 100:'#F0E8FF', 200:'#E2D4FF', 400:'#B497FF', 600:'#7A55D6' },
+          butter: { 50:'#FFF9E6', 100:'#FFF1C7', 300:'#FFDF8A', 600:'#B7791F' }
+        }
+      }
+    }
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
+  body { -webkit-tap-highlight-color: transparent; }
+  .js [data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
+  .js [data-reveal].in { opacity: 1; transform: none; }
+  .blob { position: absolute; border-radius: 9999px; filter: blur(70px); pointer-events: none; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+  .floaty { animation: floaty 6s ease-in-out infinite; }
+  .floaty-b { animation: floaty 7.5s ease-in-out -2s infinite; }
+  @keyframes pulseDot { 0% { box-shadow: 0 0 0 0 rgba(240,83,138,.5); } 70% { box-shadow: 0 0 0 8px rgba(240,83,138,0); } 100% { box-shadow: 0 0 0 0 rgba(240,83,138,0); } }
+  .pulse-dot { animation: pulseDot 2s infinite; }
+  .faq-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+  .faq-item.open .faq-panel { grid-template-rows: 1fr; }
+  .faq-item.open .faq-chevron { transform: rotate(180deg); }
+  .faq-chevron { transition: transform .3s ease; }
+  .dlg { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; }
+  .dlg::backdrop { background: rgba(58,27,42,.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .dlg[open] .dlg-panel { animation: sheetUp .35s cubic-bezier(.2,.8,.2,1); }
+  @keyframes sheetUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
+  .ing-btn[aria-pressed="true"] .ing-text { text-decoration: line-through; opacity: .5; }
+  .ing-btn[aria-pressed="true"] .ing-box { background: #C92F66; border-color: #C92F66; }
+  .ing-btn[aria-pressed="true"] .ing-box svg { opacity: 1; }
+  .noise-grid { background-image: linear-gradient(rgba(201,47,102,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(201,47,102,.06) 1px, transparent 1px); background-size: 28px 28px; mask-image: radial-gradient(ellipse at 50% 30%, #000 20%, transparent 70%); -webkit-mask-image: radial-gradient(ellipse at 50% 30%, #000 20%, transparent 70%); }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .floaty, .floaty-b, .pulse-dot { animation: none; }
+    .js [data-reveal] { opacity: 1; transform: none; transition: none; }
+  }
+  :focus-visible { outline: 2px solid #C92F66; outline-offset: 3px; border-radius: 8px; }
+</style>
+</head>
+<body class="bg-blush-50 font-sans text-plum-900 antialiased selection:bg-blush-200">
+
+<!-- Gemeinsame Waffel-Illustration -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="wg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FCE3B4"/>
+      <stop offset="1" stop-color="#EDB064"/>
+    </linearGradient>
+    <pattern id="wgrid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M0 0H24M0 0V24" stroke="#D3924A" stroke-width="3.2" opacity=".5"/>
+    </pattern>
+    <clipPath id="heartClip">
+      <path d="M100 175 C30 125 12 85 12 58 C12 30 34 14 58 14 C78 14 93 25 100 40 C107 25 122 14 142 14 C166 14 188 30 188 58 C188 85 170 125 100 175Z"/>
+    </clipPath>
+    <radialGradient id="creamG" cx=".4" cy=".3" r=".9">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#FFE3EC"/>
+    </radialGradient>
+    <symbol id="waffle" viewBox="0 0 200 200">
+      <ellipse cx="100" cy="188" rx="64" ry="7" fill="#F0A3BC" opacity=".4"/>
+      <path d="M100 175 C30 125 12 85 12 58 C12 30 34 14 58 14 C78 14 93 25 100 40 C107 25 122 14 142 14 C166 14 188 30 188 58 C188 85 170 125 100 175Z" fill="url(#wg)"/>
+      <g clip-path="url(#heartClip)">
+        <rect x="0" y="0" width="200" height="200" fill="url(#wgrid)"/>
+        <ellipse cx="62" cy="38" rx="30" ry="14" fill="#fff" opacity=".28" transform="rotate(-25 62 38)"/>
+      </g>
+      <path d="M100 175 C30 125 12 85 12 58 C12 30 34 14 58 14 C78 14 93 25 100 40 C107 25 122 14 142 14 C166 14 188 30 188 58 C188 85 170 125 100 175Z" fill="none" stroke="#DFA159" stroke-width="3"/>
+      <g>
+        <ellipse cx="100" cy="86" rx="36" ry="14" fill="url(#creamG)"/>
+        <ellipse cx="100" cy="72" rx="27" ry="12" fill="url(#creamG)"/>
+        <ellipse cx="100" cy="59" rx="18" ry="10" fill="url(#creamG)"/>
+        <path d="M100 42 C106 48 104 52 100 54 C96 52 94 48 100 42Z" fill="#fff"/>
+        <g transform="translate(58 96)">
+          <path d="M0 -13 C11 -13 15 -2 0 15 C-15 -2 -11 -13 0 -13Z" fill="#E4466F"/>
+          <path d="M-5 -12 L0 -17 L5 -12Z" fill="#6DB07A"/>
+          <circle cx="-4" cy="-2" r="1" fill="#FFD4DF"/><circle cx="4" cy="0" r="1" fill="#FFD4DF"/><circle cx="0" cy="6" r="1" fill="#FFD4DF"/>
+        </g>
+        <g transform="translate(144 100) rotate(18)">
+          <path d="M0 -13 C11 -13 15 -2 0 15 C-15 -2 -11 -13 0 -13Z" fill="#E4466F"/>
+          <path d="M-5 -12 L0 -17 L5 -12Z" fill="#6DB07A"/>
+          <circle cx="-4" cy="-2" r="1" fill="#FFD4DF"/><circle cx="4" cy="0" r="1" fill="#FFD4DF"/><circle cx="0" cy="6" r="1" fill="#FFD4DF"/>
+        </g>
+        <g fill="#B8205A">
+          <circle cx="116" cy="108" r="6"/><circle cx="126" cy="112" r="6"/><circle cx="121" cy="120" r="6"/>
+        </g>
+        <g fill="#FFFFFF" opacity=".9">
+          <circle cx="40" cy="62" r="1.6"/><circle cx="78" cy="30" r="1.6"/><circle cx="130" cy="36" r="1.6"/><circle cx="160" cy="66" r="1.6"/><circle cx="88" cy="128" r="1.6"/><circle cx="108" cy="146" r="1.6"/>
+        </g>
+        <g fill="#9ACB8B">
+          <circle cx="84" cy="112" r="2.4"/><circle cx="92" cy="120" r="2"/><circle cx="76" cy="118" r="2"/>
+        </g>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- 1. Navigation -->
+<header class="fixed inset-x-0 top-0 z-40 border-b border-blush-200/60 bg-blush-50/75 backdrop-blur-xl">
+  <nav class="mx-auto flex h-16 max-w-6xl items-center justify-between px-5" aria-label="Hauptnavigation">
+    <a href="#top" class="flex items-center gap-2.5" aria-label="Waffelwölkchen, zum Seitenanfang">
+      <svg width="34" height="34" viewBox="0 0 32 32" aria-hidden="true">
+        <defs><linearGradient id="logoG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF8DAE"/><stop offset="1" stop-color="#C92F66"/></linearGradient></defs>
+        <rect width="32" height="32" rx="11" fill="url(#logoG)"/>
+        <path d="M10.5 8.5v15M16 8.5v15M21.5 8.5v15M8.5 13h15M8.5 19h15" stroke="#fff" stroke-width="1.7" stroke-linecap="round" opacity=".95"/>
+        <circle cx="24.5" cy="7.5" r="2.4" fill="#FFF1C7"/>
+      </svg>
+      <span class="font-serif text-xl font-semibold tracking-tight text-plum-900">Waffelwölkchen</span>
+    </a>
+    <ul class="hidden items-center gap-8 text-sm font-semibold text-plum-700 md:flex">
+      <li><a href="#rezepte" class="transition hover:text-blush-600">Rezepte</a></li>
+      <li><a href="#ablauf" class="transition hover:text-blush-600">So gelingt es</a></li>
+      <li><a href="#grundteige" class="transition hover:text-blush-600">Grundteige</a></li>
+      <li><a href="#faq" class="transition hover:text-blush-600">FAQ</a></li>
+    </ul>
+    <div class="flex items-center gap-2">
+      <a href="#kontakt" class="hidden rounded-full bg-blush-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blush-600/25 transition hover:-translate-y-0.5 hover:bg-blush-700 sm:inline-flex">Newsletter</a>
+      <button id="menuBtn" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-blush-200 bg-white/70 text-plum-900 md:hidden" aria-expanded="false" aria-controls="mobileMenu" aria-label="Menü öffnen">
+        <i data-lucide="menu" class="h-5 w-5"></i>
+      </button>
+    </div>
+  </nav>
+  <div id="mobileMenu" class="hidden border-t border-blush-200/60 bg-blush-50/95 px-5 pb-6 pt-3 md:hidden">
+    <ul class="flex flex-col text-base font-semibold text-plum-800">
+      <li><a href="#rezepte" class="block rounded-xl px-3 py-3.5 hover:bg-blush-100">Rezepte</a></li>
+      <li><a href="#ablauf" class="block rounded-xl px-3 py-3.5 hover:bg-blush-100">So gelingt es</a></li>
+      <li><a href="#grundteige" class="block rounded-xl px-3 py-3.5 hover:bg-blush-100">Grundteige</a></li>
+      <li><a href="#faq" class="block rounded-xl px-3 py-3.5 hover:bg-blush-100">FAQ</a></li>
+    </ul>
+    <a href="#kontakt" class="mt-3 flex w-full items-center justify-center rounded-full bg-blush-600 px-5 py-3.5 text-base font-bold text-white">Newsletter abonnieren</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- 2. Hero -->
+<section class="relative overflow-hidden px-5 pb-16 pt-32 sm:pt-36 lg:pb-24">
+  <div class="blob -left-24 top-10 h-80 w-80 bg-blush-300/60"></div>
+  <div class="blob right-0 top-40 h-96 w-96 bg-lilac-200/70"></div>
+  <div class="blob bottom-0 left-1/3 h-64 w-64 bg-butter-300/40"></div>
+  <div class="noise-grid absolute inset-0"></div>
+
+  <div class="relative mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2">
+    <div>
+      <span class="inline-flex items-center gap-2 rounded-full border border-blush-200 bg-white/80 px-3.5 py-1.5 text-xs font-bold text-blush-700 shadow-sm backdrop-blur">
+        <span class="pulse-dot h-2 w-2 rounded-full bg-blush-500"></span>
+        Neu: Winterwaffeln mit Zimt und Beeren
+      </span>
+      <h1 class="mt-6 font-serif text-5xl font-semibold leading-[1.05] tracking-tight text-plum-900 sm:text-6xl lg:text-7xl">
+        Waffeln, die nach <em class="text-blush-600">Zuhause</em> schmecken.
+      </h1>
+      <p class="mt-6 max-w-xl text-lg leading-relaxed text-plum-700">
+        Sechs getestete Rezepte, drei Grundteige und ein Zutaten-Kompass. Vom knusprigen Klassiker bis zur veganen Beerenwaffel, mit Mengenrechner für jede Portionszahl.
+      </p>
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+        <a href="#rezepte" class="inline-flex items-center justify-center gap-2 rounded-full bg-blush-600 px-7 py-4 text-base font-bold text-white shadow-xl shadow-blush-600/25 transition hover:-translate-y-0.5 hover:bg-blush-700">
+          Rezepte entdecken <i data-lucide="arrow-right" class="h-4 w-4"></i>
+        </a>
+        <a href="#grundteige" class="inline-flex items-center justify-center gap-2 rounded-full border border-blush-300 bg-white/70 px-7 py-4 text-base font-bold text-plum-900 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white">
+          Grundteige vergleichen
+        </a>
+      </div>
+    </div>
+
+    <!-- UI-Vorschaukarte -->
+    <div class="relative mx-auto w-full max-w-md">
+      <div class="floaty absolute -right-2 -top-5 z-10 flex items-center gap-2 rounded-2xl border border-blush-200/80 bg-white/90 px-3.5 py-2.5 text-xs font-bold text-plum-800 shadow-lg backdrop-blur sm:-right-8">
+        <i data-lucide="star" class="h-4 w-4 fill-butter-300 text-butter-600"></i> 4,9 aus 2'318 Bewertungen
+      </div>
+      <div class="floaty-b absolute -bottom-5 -left-2 z-10 flex items-center gap-2 rounded-2xl border border-blush-200/80 bg-white/90 px-3.5 py-2.5 text-xs font-bold text-plum-800 shadow-lg backdrop-blur sm:-left-8">
+        <i data-lucide="timer" class="h-4 w-4 text-lilac-600"></i> Teig ruht 10 Min
+      </div>
+
+      <div class="overflow-hidden rounded-3xl border border-blush-200/80 bg-white/85 shadow-2xl shadow-blush-600/10 backdrop-blur">
+        <div class="relative flex h-60 items-center justify-center bg-gradient-to-br from-blush-200 via-blush-100 to-lilac-100">
+          <div class="absolute left-4 top-4 rounded-full bg-white/80 px-3 py-1 text-xs font-bold text-blush-700">Rezept des Tages</div>
+          <svg viewBox="0 0 200 200" class="h-52 w-52 drop-shadow-xl" role="img" aria-label="Illustration einer Herzwaffel mit Sahne und Erdbeeren"><use href="#waffle"/></svg>
+        </div>
+        <div class="p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h2 class="font-serif text-2xl font-semibold">Klassische Herzwaffeln</h2>
+              <p class="mt-1 text-sm text-plum-600">Knusprig aussen, weich innen</p>
+            </div>
+            <span class="rounded-full bg-lilac-100 px-3 py-1 text-xs font-bold text-lilac-600">Einfach</span>
+          </div>
+          <div class="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-plum-700">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-blush-100 px-3 py-1.5"><i data-lucide="clock" class="h-3.5 w-3.5"></i> 25 Min</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-blush-100 px-3 py-1.5"><i data-lucide="users" class="h-3.5 w-3.5"></i> 4 Portionen</span>
+          </div>
+          <ul class="mt-5 space-y-2" id="heroChecklist">
+            <li><button type="button" aria-pressed="false" class="ing-btn flex w-full items-center gap-3 rounded-xl px-2 py-1.5 text-left text-sm hover:bg-blush-50"><span class="ing-box flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-blush-300 bg-white"><svg class="h-3 w-3 text-white opacity-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><span class="ing-text"><b>250 g</b> Weizenmehl</span></button></li>
+            <li><button type="button" aria-pressed="false" class="ing-btn flex w-full items-center gap-3 rounded-xl px-2 py-1.5 text-left text-sm hover:bg-blush-50"><span class="ing-box flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-blush-300 bg-white"><svg class="h-3 w-3 text-white opacity-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><span class="ing-text"><b>3</b> Eier</span></button></li>
+            <li><button type="button" aria-pressed="false" class="ing-btn flex w-full items-center gap-3 rounded-xl px-2 py-1.5 text-left text-sm hover:bg-blush-50"><span class="ing-box flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-blush-300 bg-white"><svg class="h-3 w-3 text-white opacity-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span><span class="ing-text"><b>300 ml</b> Milch</span></button></li>
+          </ul>
+          <button type="button" data-open-recipe="klassisch" class="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-plum-900 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-plum-800">
+            Ganzes Rezept öffnen <i data-lucide="arrow-up-right" class="h-4 w-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Trust-Bar -->
+<section class="px-5" aria-label="Kennzahlen">
+  <div class="mx-auto max-w-6xl rounded-3xl border border-blush-200/80 bg-white/80 px-4 py-7 shadow-sm backdrop-blur sm:px-8" data-reveal>
+    <dl class="grid grid-cols-2 gap-y-7 text-center md:grid-cols-4 md:divide-x md:divide-blush-200/70">
+      <div class="flex flex-col-reverse"><dt class="mt-1 text-sm text-plum-600">getestete Rezepte</dt><dd class="font-serif text-4xl font-semibold text-blush-600">6</dd></div>
+      <div class="flex flex-col-reverse"><dt class="mt-1 text-sm text-plum-600">Durchschnittsbewertung</dt><dd class="font-serif text-4xl font-semibold text-blush-600">4,9</dd></div>
+      <div class="flex flex-col-reverse"><dt class="mt-1 text-sm text-plum-600">vom Rühren bis zum Teller</dt><dd class="font-serif text-4xl font-semibold text-blush-600">25 Min</dd></div>
+      <div class="flex flex-col-reverse"><dt class="mt-1 text-sm text-plum-600">ohne Spezialzutaten</dt><dd class="font-serif text-4xl font-semibold text-blush-600">100 %</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- 4. Bento-Grid: Rezepte -->
+<section id="rezepte" class="px-5 py-24">
+  <div class="mx-auto max-w-6xl">
+    <div class="max-w-2xl" data-reveal>
+      <p class="text-sm font-bold uppercase tracking-widest text-blush-600">Rezepte</p>
+      <h2 class="mt-3 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">Sechs Waffeln, sechs Stimmungen</h2>
+      <p class="mt-4 text-lg leading-relaxed text-plum-700">Tippe auf eine Karte, um Zutaten und Schritte zu sehen. Der Mengenrechner passt alles an deine Portionszahl an.</p>
+    </div>
+
+    <div class="mt-12 grid gap-4 lg:grid-cols-6">
+      <!-- Klassisch -->
+      <button type="button" data-open-recipe="klassisch" data-reveal class="group relative overflow-hidden rounded-3xl border border-blush-200/80 bg-gradient-to-br from-blush-100 to-white p-7 text-left transition hover:-translate-y-1 hover:shadow-xl hover:shadow-blush-600/10 lg:col-span-4">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blush-600 text-white"><i data-lucide="heart" class="h-6 w-6"></i></div>
+        <h3 class="mt-5 font-serif text-3xl font-semibold">Klassische Herzwaffeln</h3>
+        <p class="mt-2 max-w-sm leading-relaxed text-plum-700">Der Rührteig für jeden Tag. Fünf Minuten Arbeit, dann nur noch backen und Beeren darauf.</p>
+        <div class="mt-5 flex flex-wrap gap-2 text-xs font-bold text-plum-700">
+          <span class="rounded-full bg-white px-3 py-1.5">25 Min</span><span class="rounded-full bg-white px-3 py-1.5">Einfach</span><span class="rounded-full bg-white px-3 py-1.5">Süss</span>
+        </div>
+        <span class="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-blush-600">Rezept ansehen <i data-lucide="arrow-right" class="h-4 w-4 transition group-hover:translate-x-1"></i></span>
+        <svg viewBox="0 0 200 200" class="absolute -bottom-6 -right-4 h-48 w-48 rotate-6 opacity-90 transition group-hover:rotate-0 sm:h-60 sm:w-60" aria-hidden="true"><use href="#waffle"/></svg>
+      </button>
+      <!-- Brüsseler -->
+      <button type="button" data-open-recipe="bruesseler" data-reveal class="group relative rounded-3xl border border-lilac-200/80 bg-gradient-to-br from-lilac-100 to-white p-7 text-left transition hover:-translate-y-1 hover:shadow-xl hover:shadow-lilac-600/10 lg:col-span-2">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-lilac-600 text-white"><i data-lucide="cloud" class="h-6 w-6"></i></div>
+        <h3 class="mt-5 font-serif text-2xl font-semibold">Brüsseler Hefewaffeln</h3>
+        <p class="mt-2 leading-relaxed text-plum-700">Luftig wie eine Wolke, mit knuspriger Kruste.</p>
+        <div class="mt-4 flex flex-wrap gap-2 text-xs font-bold text-plum-700"><span class="rounded-full bg-white px-3 py-1.5">50 Min</span><span class="rounded-full bg-white px-3 py-1.5">Mittel</span></div>
+        <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-lilac-600">Rezept ansehen <i data-lucide="arrow-right" class="h-4 w-4 transition group-hover:translate-x-1"></i></span>
+      </button>
+      <!-- Lütticher -->
+      <button type="button" data-open-recipe="luettich" data-reveal class="group rounded-3xl border border-butter-300/60 bg-gradient-to-br from-butter-100 to-white p-7 text-left transition hover:-translate-y-1 hover:shadow-xl hover:shadow-butter-600/10 lg:col-span-2">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-butter-300 text-plum-900"><i data-lucide="candy" class="h-6 w-6"></i></div>
+        <h3 class="mt-5 font-serif text-2xl font-semibold">Lütticher Waffeln</h3>
+        <p class="mt-2 leading-relaxed text-plum-700">Mit Perlzucker, der beim Backen karamellisiert.</p>
+        <div class="mt-4 flex flex-wrap gap-2 text-xs font-bold text-plum-700"><span class="rounded-full bg-white px-3 py-1.5">60 Min</span><span class="rounded-full bg-white px-3 py-1.5">Mittel</span></div>
+        <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-butter-600">Rezept ansehen <i data-lucide="arrow-right" class="h-4 w-4 transition group-hover:translate-x-1"></i></span>
+      </button>
+      <!-- Vegan -->
+      <button type="button" data-open-recipe="vegan" data-reveal class="group relative overflow-hidden rounded-3xl border border-blush-200/80 bg-gradient-to-br from-white via-blush-50 to-blush-200/70 p-7 text-left transition hover:-translate-y-1 hover:shadow-xl hover:shadow-blush-600/10 lg:col-span-4">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blush-500 text-white"><i data-lucide="leaf" class="h-6 w-6"></i></div>
+        <h3 class="mt-5 font-serif text-3xl font-semibold">Vegane Beerenwaffeln</h3>
+        <p class="mt-2 max-w-md leading-relaxed text-plum-700">Ohne Ei und ohne Milch, trotzdem knusprig. Ein Schuss Zitronensaft macht den Teig besonders locker.</p>
+        <div class="mt-5 flex flex-wrap gap-2 text-xs font-bold text-plum-700"><span class="rounded-full bg-white px-3 py-1.5">25 Min</span><span class="rounded-full bg-white px-3 py-1.5">Einfach</span><span class="rounded-full bg-white px-3 py-1.5">Vegan</span></div>
+        <span class="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-blush-600">Rezept ansehen <i data-lucide="arrow-right" class="h-4 w-4 transition group-hover:translate-x-1"></i></span>
+        <div class="absolute -bottom-10 -right-6 flex gap-2 opacity-90" aria-hidden="true">
+          <span class="h-20 w-20 rounded-full bg-blush-300/70"></span><span class="mt-8 h-14 w-14 rounded-full bg-lilac-200"></span><span class="h-16 w-16 rounded-full bg-blush-400/60"></span>
+        </div>
+      </button>
+      <!-- Herzhaft -->
+      <button type="button" data-open-recipe="herzhaft" data-reveal class="group rounded-3xl border border-lilac-200/80 bg-white p-7 text-left transition hover:-translate-y-1 hover:shadow-xl hover:shadow-lilac-600/10 lg:col-span-3">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-lilac-100 text-lilac-600"><i data-lucide="chef-hat" class="h-6 w-6"></i></div>
+        <h3 class="mt-5 font-serif text-2xl font-semibold">Käse-Kräuter-Waffeln</h3>
+        <p class="mt-2 leading-relaxed text-plum-700">Herzhaft mit Greyerzer und Schnittlauch. Passen zu Suppe, Salat oder einfach mit Frischkäse.</p>
+        <div class="mt-4 flex flex-wrap gap-2 text-xs font-bold text-plum-700"><span class="rounded-full bg-lilac-50 px-3 py-1.5">25 Min</span><span class="rounded-full bg-lilac-50 px-3 py-1.5">Einfach</span><span class="rounded-full bg-lilac-50 px-3 py-1.5">Herzhaft</span></div>
+        <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-lilac-600">Rezept ansehen <i data-lucide="arrow-right" class="h-4 w-4 transition group-hover:translate-x-1"></i></span>
+      </button>
+      <!-- Schoko -->
+      <button type="button" data-open-recipe="schoko" data-reveal class="group rounded-3xl border border-blush-200/80 bg-white p-7 text-left transition hover:-translate-y-1 hover:shadow-xl hover:shadow-blush-600/10 lg:col-span-3">
+        <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blush-100 text-blush-700"><i data-lucide="cookie" class="h-6 w-6"></i></div>
+        <h3 class="mt-5 font-serif text-2xl font-semibold">Schoko-Brownie-Waffeln</h3>
+        <p class="mt-2 leading-relaxed text-plum-700">Saftig und kakaotief, mit gehackter Schokolade im Teig. Der Dessert-Favorit.</p>
+        <div class="mt-4 flex flex-wrap gap-2 text-xs font-bold text-plum-700"><span class="rounded-full bg-blush-50 px-3 py-1.5">30 Min</span><span class="rounded-full bg-blush-50 px-3 py-1.5">Einfach</span><span class="rounded-full bg-blush-50 px-3 py-1.5">Süss</span></div>
+        <span class="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-blush-600">Rezept ansehen <i data-lucide="arrow-right" class="h-4 w-4 transition group-hover:translate-x-1"></i></span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Ablauf -->
+<section id="ablauf" class="relative overflow-hidden bg-white/60 px-5 py-24">
+  <div class="blob -right-20 top-0 h-72 w-72 bg-lilac-100"></div>
+  <div class="relative mx-auto max-w-6xl">
+    <div class="mx-auto max-w-2xl text-center" data-reveal>
+      <p class="text-sm font-bold uppercase tracking-widest text-blush-600">So gelingt es</p>
+      <h2 class="mt-3 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">Drei Schritte zur perfekten Waffel</h2>
+    </div>
+    <ol class="mt-14 grid gap-5 md:grid-cols-3">
+      <li data-reveal class="rounded-3xl border border-blush-200/80 bg-white p-7 shadow-sm">
+        <span class="flex h-12 w-12 items-center justify-center rounded-full bg-blush-600 font-serif text-xl font-semibold text-white">1</span>
+        <h3 class="mt-5 text-xl font-bold">Teig anrühren</h3>
+        <p class="mt-2 leading-relaxed text-plum-700">Trockene und feuchte Zutaten getrennt mischen, dann nur kurz verrühren. Kleine Klümpchen sind erlaubt und machen die Waffeln zarter.</p>
+      </li>
+      <li data-reveal class="rounded-3xl border border-blush-200/80 bg-white p-7 shadow-sm">
+        <span class="flex h-12 w-12 items-center justify-center rounded-full bg-blush-600 font-serif text-xl font-semibold text-white">2</span>
+        <h3 class="mt-5 text-xl font-bold">Ruhen lassen</h3>
+        <p class="mt-2 leading-relaxed text-plum-700">Rührteig 10 Minuten quellen lassen, Hefeteig 45 Minuten gehen lassen. So wird der Teig luftiger und das Mehl bindet die Flüssigkeit.</p>
+      </li>
+      <li data-reveal class="rounded-3xl border border-blush-200/80 bg-white p-7 shadow-sm">
+        <span class="flex h-12 w-12 items-center justify-center rounded-full bg-blush-600 font-serif text-xl font-semibold text-white">3</span>
+        <h3 class="mt-5 text-xl font-bold">Backen und toppen</h3>
+        <p class="mt-2 leading-relaxed text-plum-700">Eisen gut vorheizen, Teig einfüllen und goldgelb backen. Auf einem Gitter auskühlen lassen, damit die Waffeln knusprig bleiben.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- 6. Grundteige (Vergleich) -->
+<section id="grundteige" class="px-5 py-24">
+  <div class="mx-auto max-w-6xl">
+    <div class="max-w-2xl" data-reveal>
+      <p class="text-sm font-bold uppercase tracking-widest text-blush-600">Grundteige</p>
+      <h2 class="mt-3 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">Welcher Teig passt zu dir?</h2>
+      <p class="mt-4 text-lg leading-relaxed text-plum-700">Drei Grundteige im Vergleich, mit den wichtigsten Zutaten für vier Portionen.</p>
+    </div>
+
+    <div class="mt-12 grid items-stretch gap-5 lg:grid-cols-3">
+      <!-- Klassiker -->
+      <article data-reveal class="flex flex-col rounded-3xl border border-blush-200/80 bg-white p-7">
+        <h3 class="text-lg font-bold">Der Klassiker</h3>
+        <p class="mt-1 text-sm text-plum-600">Rührteig mit Backpulver</p>
+        <p class="mt-6 font-serif text-5xl font-semibold text-plum-900">25 <span class="text-xl font-medium text-plum-600">Min</span></p>
+        <ul class="mt-6 flex-1 space-y-3 text-sm text-plum-800">
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>250 g Mehl, 60 g Zucker</li>
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>3 Eier, 300 ml Milch</li>
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>120 g geschmolzene Butter</li>
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>Weich innen, goldgelb aussen</li>
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>Ideal für spontane Gelüste</li>
+        </ul>
+        <button type="button" data-open-recipe="klassisch" class="mt-7 w-full rounded-full border border-blush-300 px-5 py-3.5 text-sm font-bold text-plum-900 transition hover:bg-blush-50">Rezept öffnen</button>
+      </article>
+      <!-- Brüsseler (beliebt) -->
+      <article data-reveal class="relative flex flex-col rounded-3xl border-2 border-blush-500 bg-gradient-to-b from-blush-100 to-white p-7 shadow-2xl shadow-blush-600/15 lg:-my-4 lg:py-11">
+        <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-blush-600 px-4 py-1.5 text-xs font-bold text-white shadow-lg">Beliebt</span>
+        <h3 class="text-lg font-bold">Der Wolkige</h3>
+        <p class="mt-1 text-sm text-plum-600">Hefeteig nach Brüsseler Art</p>
+        <p class="mt-6 font-serif text-5xl font-semibold text-plum-900">50 <span class="text-xl font-medium text-plum-600">Min</span></p>
+        <ul class="mt-6 flex-1 space-y-3 text-sm text-plum-800">
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>300 g Mehl, 7 g Trockenhefe</li>
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>3 Eier, getrennt</li>
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>350 ml lauwarme Milch</li>
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>Luftig mit knuspriger Kruste</li>
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>Ideal für Brunch und Gäste</li>
+        </ul>
+        <button type="button" data-open-recipe="bruesseler" class="mt-7 w-full rounded-full bg-blush-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-blush-600/25 transition hover:bg-blush-700">Rezept öffnen</button>
+      </article>
+      <!-- Vegan -->
+      <article data-reveal class="flex flex-col rounded-3xl border border-blush-200/80 bg-white p-7">
+        <h3 class="text-lg font-bold">Der Pflanzliche</h3>
+        <p class="mt-1 text-sm text-plum-600">Vegan, ohne Ei und Milch</p>
+        <p class="mt-6 font-serif text-5xl font-semibold text-plum-900">25 <span class="text-xl font-medium text-plum-600">Min</span></p>
+        <ul class="mt-6 flex-1 space-y-3 text-sm text-plum-800">
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>250 g Mehl, 50 g Zucker</li>
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>400 ml Haferdrink</li>
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>60 ml Rapsöl, 1 EL Zitronensaft</li>
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>Besonders knusprige Ränder</li>
+          <li class="flex gap-3"><i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-blush-600"></i>Ideal bei Allergien</li>
+        </ul>
+        <button type="button" data-open-recipe="vegan" class="mt-7 w-full rounded-full border border-blush-300 px-5 py-3.5 text-sm font-bold text-plum-900 transition hover:bg-blush-50">Rezept öffnen</button>
+      </article>
+    </div>
+
+    <!-- Zutaten-Kompass -->
+    <div class="mt-20" data-reveal>
+      <h3 class="font-serif text-3xl font-semibold">Zutaten-Kompass</h3>
+      <p class="mt-2 text-plum-700">Was in den Teig gehört und warum.</p>
+      <div class="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-2xl border border-blush-200/80 bg-white p-5"><div class="flex h-10 w-10 items-center justify-center rounded-xl bg-butter-100 text-butter-600"><i data-lucide="wheat" class="h-5 w-5"></i></div><h4 class="mt-4 font-bold">Mehl</h4><p class="mt-1.5 text-sm leading-relaxed text-plum-700">Weissmehl oder Halbweissmehl passt. Für mehr Biss ersetzt du die Hälfte durch Dinkelmehl.</p></div>
+        <div class="rounded-2xl border border-blush-200/80 bg-white p-5"><div class="flex h-10 w-10 items-center justify-center rounded-xl bg-lilac-100 text-lilac-600"><i data-lucide="milk" class="h-5 w-5"></i></div><h4 class="mt-4 font-bold">Milch</h4><p class="mt-1.5 text-sm leading-relaxed text-plum-700">Zimmerwarm mischt sie sich besser. Mit Buttermilch wird der Teig fluffiger.</p></div>
+        <div class="rounded-2xl border border-blush-200/80 bg-white p-5"><div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blush-100 text-blush-600"><i data-lucide="droplets" class="h-5 w-5"></i></div><h4 class="mt-4 font-bold">Fett</h4><p class="mt-1.5 text-sm leading-relaxed text-plum-700">Geschmolzene Butter gibt Aroma, Rapsöl sorgt für extra knusprige Ränder.</p></div>
+        <div class="rounded-2xl border border-blush-200/80 bg-white p-5"><div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blush-100 text-blush-600"><i data-lucide="sparkles" class="h-5 w-5"></i></div><h4 class="mt-4 font-bold">Triebmittel</h4><p class="mt-1.5 text-sm leading-relaxed text-plum-700">Backpulver für Rührteig, Hefe für Brüsseler und Lütticher Waffeln. Nicht austauschbar.</p></div>
+      </div>
+      <div class="mt-7 flex flex-wrap gap-2.5">
+        <span class="mr-1 self-center text-sm font-bold text-plum-800">Toppings:</span>
+        <span class="rounded-full bg-blush-100 px-4 py-2 text-sm font-semibold text-blush-700">Erdbeeren</span>
+        <span class="rounded-full bg-blush-100 px-4 py-2 text-sm font-semibold text-blush-700">Himbeeren</span>
+        <span class="rounded-full bg-lilac-100 px-4 py-2 text-sm font-semibold text-lilac-600">Heidelbeeren</span>
+        <span class="rounded-full bg-butter-100 px-4 py-2 text-sm font-semibold text-butter-600">Honig</span>
+        <span class="rounded-full bg-blush-100 px-4 py-2 text-sm font-semibold text-blush-700">Vanillecreme</span>
+        <span class="rounded-full bg-lilac-100 px-4 py-2 text-sm font-semibold text-lilac-600">Mascarpone</span>
+        <span class="rounded-full bg-butter-100 px-4 py-2 text-sm font-semibold text-butter-600">Ahornsirup</span>
+        <span class="rounded-full bg-blush-100 px-4 py-2 text-sm font-semibold text-blush-700">Pistazien</span>
+        <span class="rounded-full bg-lilac-100 px-4 py-2 text-sm font-semibold text-lilac-600">Zimtzucker</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Kundenstimmen -->
+<section class="relative overflow-hidden bg-gradient-to-b from-blush-100/70 to-blush-50 px-5 py-24" aria-labelledby="stimmen">
+  <div class="relative mx-auto max-w-6xl">
+    <div class="mx-auto max-w-2xl text-center" data-reveal>
+      <p class="text-sm font-bold uppercase tracking-widest text-blush-600">Kundenstimmen</p>
+      <h2 id="stimmen" class="mt-3 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">Gebacken, geliebt, nachgemacht</h2>
+    </div>
+    <div class="mt-14 grid gap-5 md:grid-cols-3">
+      <figure data-reveal class="rounded-3xl border border-blush-200/80 bg-white p-7 shadow-sm">
+        <div class="flex gap-0.5 text-butter-600" aria-label="5 von 5 Sternen"><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i></div>
+        <blockquote class="mt-4 leading-relaxed text-plum-800">Die Brüsseler sind aussen knusprig und innen luftig. Meine beiden Kinder wollen sie jetzt jeden Sonntag.</blockquote>
+        <figcaption class="mt-6 flex items-center gap-3"><span class="flex h-11 w-11 items-center justify-center rounded-full bg-blush-200 font-bold text-blush-800">NK</span><span><span class="block text-sm font-bold">Nadine K.</span><span class="text-sm text-plum-600">Mutter von zwei Kindern, Luzern</span></span></figcaption>
+      </figure>
+      <figure data-reveal class="rounded-3xl border border-blush-200/80 bg-white p-7 shadow-sm">
+        <div class="flex gap-0.5 text-butter-600" aria-label="5 von 5 Sternen"><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i></div>
+        <blockquote class="mt-4 leading-relaxed text-plum-800">Endlich vegane Waffeln, die nicht gummig werden. Der Schuss Zitronensaft im Teig ist Gold wert.</blockquote>
+        <figcaption class="mt-6 flex items-center gap-3"><span class="flex h-11 w-11 items-center justify-center rounded-full bg-lilac-200 font-bold text-lilac-600">SM</span><span><span class="block text-sm font-bold">Selina M.</span><span class="text-sm text-plum-600">Studentin, Zürich</span></span></figcaption>
+      </figure>
+      <figure data-reveal class="rounded-3xl border border-blush-200/80 bg-white p-7 shadow-sm">
+        <div class="flex gap-0.5 text-butter-600" aria-label="5 von 5 Sternen"><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i><i data-lucide="star" class="h-4 w-4 fill-current"></i></div>
+        <blockquote class="mt-4 leading-relaxed text-plum-800">Der Mengenrechner hat mir beim Brunch mit zehn Gästen den Taschenrechner erspart. Alles ging genau auf.</blockquote>
+        <figcaption class="mt-6 flex items-center gap-3"><span class="flex h-11 w-11 items-center justify-center rounded-full bg-butter-100 font-bold text-butter-600">CB</span><span><span class="block text-sm font-bold">Corinne B.</span><span class="text-sm text-plum-600">Hobbybäckerin, Bern</span></span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 8. FAQ -->
+<section id="faq" class="px-5 py-24">
+  <div class="mx-auto max-w-3xl">
+    <div class="text-center" data-reveal>
+      <p class="text-sm font-bold uppercase tracking-widest text-blush-600">FAQ</p>
+      <h2 class="mt-3 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">Häufige Fragen</h2>
+    </div>
+    <div class="mt-12 space-y-3" id="faqList" data-reveal>
+      <div class="faq-item rounded-2xl border border-blush-200/80 bg-white">
+        <h3><button type="button" class="faq-btn flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-bold" aria-expanded="false">Welches Waffeleisen brauche ich?<i data-lucide="chevron-down" class="faq-chevron h-5 w-5 shrink-0 text-blush-600"></i></button></h3>
+        <div class="faq-panel"><div class="overflow-hidden"><p class="px-6 pb-5 leading-relaxed text-plum-700">Jedes Standardeisen reicht für alle sechs Rezepte. Für Brüsseler Waffeln lohnt sich ein Eisen mit tiefen Mulden, die Waffeln werden damit besonders luftig.</p></div></div>
+      </div>
+      <div class="faq-item rounded-2xl border border-blush-200/80 bg-white">
+        <h3><button type="button" class="faq-btn flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-bold" aria-expanded="false">Warum werden meine Waffeln weich?<i data-lucide="chevron-down" class="faq-chevron h-5 w-5 shrink-0 text-blush-600"></i></button></h3>
+        <div class="faq-panel"><div class="overflow-hidden"><p class="px-6 pb-5 leading-relaxed text-plum-700">Meist staut sich Dampf. Lege die fertigen Waffeln nebeneinander auf ein Gitter und stapele sie nicht. Das Eisen sollte ausserdem gut vorgeheizt sein, bevor der Teig hineinkommt.</p></div></div>
+      </div>
+      <div class="faq-item rounded-2xl border border-blush-200/80 bg-white">
+        <h3><button type="button" class="faq-btn flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-bold" aria-expanded="false">Kann ich den Teig vorbereiten?<i data-lucide="chevron-down" class="faq-chevron h-5 w-5 shrink-0 text-blush-600"></i></button></h3>
+        <div class="faq-panel"><div class="overflow-hidden"><p class="px-6 pb-5 leading-relaxed text-plum-700">Rührteig hält sich abgedeckt bis zu 24 Stunden im Kühlschrank, Hefeteig geht über Nacht kühl. Fertig gebackene Waffeln lassen sich einfrieren und im Toaster aufbacken.</p></div></div>
+      </div>
+      <div class="faq-item rounded-2xl border border-blush-200/80 bg-white">
+        <h3><button type="button" class="faq-btn flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-bold" aria-expanded="false">Wie ersetze ich Eier?<i data-lucide="chevron-down" class="faq-chevron h-5 w-5 shrink-0 text-blush-600"></i></button></h3>
+        <div class="faq-panel"><div class="overflow-hidden"><p class="px-6 pb-5 leading-relaxed text-plum-700">In Rührteigen ersetzt ein Esslöffel gemahlene Leinsamen mit drei Esslöffeln Wasser ein Ei. Am einfachsten ist unser veganes Rezept, das ganz ohne Ei auskommt.</p></div></div>
+      </div>
+      <div class="faq-item rounded-2xl border border-blush-200/80 bg-white">
+        <h3><button type="button" class="faq-btn flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-bold" aria-expanded="false">Geht das auch glutenfrei?<i data-lucide="chevron-down" class="faq-chevron h-5 w-5 shrink-0 text-blush-600"></i></button></h3>
+        <div class="faq-panel"><div class="overflow-hidden"><p class="px-6 pb-5 leading-relaxed text-plum-700">Ja, mit einer glutenfreien Mehlmischung im Verhältnis 1 zu 1. Lass den Teig dann 15 Minuten länger ruhen, damit er genug Flüssigkeit aufnimmt.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. Kontakt -->
+<section id="kontakt" class="relative overflow-hidden px-5 pb-24">
+  <div class="mx-auto max-w-6xl">
+    <div class="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-blush-600 via-blush-500 to-lilac-400 p-6 shadow-2xl shadow-blush-600/20 sm:p-12" data-reveal>
+      <div class="blob -right-10 -top-10 h-64 w-64 bg-white/25"></div>
+      <div class="relative grid items-center gap-10 lg:grid-cols-2">
+        <div class="text-white">
+          <h2 class="font-serif text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">Neue Rezepte direkt in dein Postfach</h2>
+          <p class="mt-4 max-w-md text-lg leading-relaxed text-white/90">Einmal im Monat ein neues Waffelrezept. Du kannst dir auch ein Rezept wünschen oder uns eine Frage stellen.</p>
+          <ul class="mt-6 space-y-2.5 text-sm font-semibold">
+            <li class="flex items-center gap-2.5"><i data-lucide="mail" class="h-4 w-4"></i> hallo@waffelwoelkchen.ch</li>
+            <li class="flex items-center gap-2.5"><i data-lucide="map-pin" class="h-4 w-4"></i> Lindenweg 12, 3011 Bern</li>
+            <li class="flex items-center gap-2.5"><i data-lucide="clock" class="h-4 w-4"></i> Antwort innert 2 Werktagen</li>
+          </ul>
+        </div>
+
+        <div class="rounded-3xl bg-white p-6 shadow-xl sm:p-8">
+          <form id="contactForm" novalidate class="space-y-4">
+            <div>
+              <label for="cName" class="text-sm font-bold">Name</label>
+              <input id="cName" name="name" type="text" autocomplete="name" class="mt-1.5 w-full rounded-xl border border-blush-200 bg-blush-50/60 px-4 py-3 text-base outline-none transition focus:border-blush-500 focus:ring-4 focus:ring-blush-200/70" placeholder="Dein Vorname">
+              <p class="err mt-1 hidden text-sm font-semibold text-blush-700" id="eName"></p>
+            </div>
+            <div>
+              <label for="cMail" class="text-sm font-bold">E-Mail</label>
+              <input id="cMail" name="email" type="email" autocomplete="email" inputmode="email" class="mt-1.5 w-full rounded-xl border border-blush-200 bg-blush-50/60 px-4 py-3 text-base outline-none transition focus:border-blush-500 focus:ring-4 focus:ring-blush-200/70" placeholder="du@beispiel.ch">
+              <p class="err mt-1 hidden text-sm font-semibold text-blush-700" id="eMail"></p>
+            </div>
+            <div>
+              <label for="cTopic" class="text-sm font-bold">Worum geht es?</label>
+              <select id="cTopic" name="topic" class="mt-1.5 w-full rounded-xl border border-blush-200 bg-blush-50/60 px-4 py-3 text-base outline-none transition focus:border-blush-500 focus:ring-4 focus:ring-blush-200/70">
+                <option value="">Bitte wählen</option>
+                <option value="newsletter">Newsletter abonnieren</option>
+                <option value="wunsch">Rezeptwunsch</option>
+                <option value="frage">Frage zu einem Rezept</option>
+              </select>
+              <p class="err mt-1 hidden text-sm font-semibold text-blush-700" id="eTopic"></p>
+            </div>
+            <div>
+              <label for="cMsg" class="text-sm font-bold">Nachricht <span class="font-medium text-plum-600">(optional)</span></label>
+              <textarea id="cMsg" name="message" rows="3" class="mt-1.5 w-full resize-none rounded-xl border border-blush-200 bg-blush-50/60 px-4 py-3 text-base outline-none transition focus:border-blush-500 focus:ring-4 focus:ring-blush-200/70" placeholder="Welche Waffel soll als Nächstes kommen?"></textarea>
+            </div>
+            <div>
+              <label class="flex cursor-pointer items-start gap-3 text-sm text-plum-700">
+                <input id="cConsent" type="checkbox" class="mt-0.5 h-5 w-5 shrink-0 rounded border-blush-300 accent-[#C92F66]">
+                <span>Ich habe die <button type="button" data-open-legal="datenschutz" class="font-bold text-blush-600 underline underline-offset-2">Datenschutzerklärung</button> gelesen.</span>
+              </label>
+              <p class="err mt-1 hidden text-sm font-semibold text-blush-700" id="eConsent"></p>
+            </div>
+            <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-full bg-blush-600 px-6 py-4 text-base font-bold text-white shadow-lg shadow-blush-600/25 transition hover:bg-blush-700">Absenden <i data-lucide="send" class="h-4 w-4"></i></button>
+          </form>
+          <div id="formOk" class="hidden py-8 text-center" role="status" aria-live="polite">
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blush-100 text-blush-600"><i data-lucide="heart" class="h-8 w-8 fill-current"></i></div>
+            <h3 class="mt-5 font-serif text-2xl font-semibold" id="okTitle">Danke!</h3>
+            <p class="mt-2 leading-relaxed text-plum-700">Deine Nachricht ist angekommen. Wir melden uns innert zwei Werktagen.</p>
+            <button type="button" id="formReset" class="mt-6 rounded-full border border-blush-300 px-5 py-3 text-sm font-bold hover:bg-blush-50">Weitere Nachricht senden</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- Footer -->
+<footer class="border-t border-blush-200/70 bg-white/70 px-5 pb-10 pt-14">
+  <div class="mx-auto grid max-w-6xl gap-10 md:grid-cols-4">
+    <div class="md:col-span-2">
+      <a href="#top" class="flex items-center gap-2.5">
+        <svg width="34" height="34" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="11" fill="url(#logoG)"/>
+          <path d="M10.5 8.5v15M16 8.5v15M21.5 8.5v15M8.5 13h15M8.5 19h15" stroke="#fff" stroke-width="1.7" stroke-linecap="round" opacity=".95"/>
+          <circle cx="24.5" cy="7.5" r="2.4" fill="#FFF1C7"/>
+        </svg>
+        <span class="font-serif text-xl font-semibold">Waffelwölkchen</span>
+      </a>
+      <p class="mt-4 max-w-sm leading-relaxed text-plum-700">Getestete Waffelrezepte, ehrliche Zutatentipps und Teige, die auch beim ersten Mal gelingen.</p>
+    </div>
+    <div>
+      <h4 class="text-sm font-bold uppercase tracking-widest text-plum-600">Entdecken</h4>
+      <ul class="mt-4 space-y-2.5 text-sm font-semibold text-plum-800">
+        <li><a href="#rezepte" class="hover:text-blush-600">Rezepte</a></li>
+        <li><a href="#ablauf" class="hover:text-blush-600">So gelingt es</a></li>
+        <li><a href="#grundteige" class="hover:text-blush-600">Grundteige</a></li>
+        <li><a href="#faq" class="hover:text-blush-600">FAQ</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="text-sm font-bold uppercase tracking-widest text-plum-600">Kontakt</h4>
+      <ul class="mt-4 space-y-2.5 text-sm font-semibold text-plum-800">
+        <li>hallo@waffelwoelkchen.ch</li>
+        <li>Lindenweg 12, 3011 Bern</li>
+        <li><button type="button" data-open-legal="impressum" class="hover:text-blush-600">Impressum</button></li>
+        <li><button type="button" data-open-legal="datenschutz" class="hover:text-blush-600">Datenschutz</button></li>
+      </ul>
+    </div>
+  </div>
+  <p class="mx-auto mt-12 max-w-6xl border-t border-blush-200/70 pt-6 text-sm text-plum-600">© 2026 Waffelwölkchen. Mit Liebe gebacken in Bern.</p>
+</footer>
+
+<!-- Rezept-Dialog -->
+<dialog id="recipeDlg" class="dlg" aria-labelledby="rTitle">
+  <div class="flex h-full items-end justify-center sm:items-center sm:p-6" data-backdrop>
+    <div class="dlg-panel max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white shadow-2xl sm:max-w-2xl sm:rounded-3xl" id="recipePanel"></div>
+  </div>
+</dialog>
+
+<!-- Rechtliches-Dialog -->
+<dialog id="legalDlg" class="dlg" aria-labelledby="lTitle">
+  <div class="flex h-full items-end justify-center sm:items-center sm:p-6" data-backdrop>
+    <div class="dlg-panel max-h-[88vh] w-full overflow-y-auto rounded-t-3xl bg-white p-7 shadow-2xl sm:max-w-xl sm:rounded-3xl sm:p-9" id="legalPanel"></div>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  'use strict';
+  var icons = function () { if (window.lucide) { try { lucide.createIcons(); } catch (e) {} } };
+  icons();
+
+  /* ---------- Mobiles Menü ---------- */
+  var menuBtn = document.getElementById('menuBtn');
+  var mobileMenu = document.getElementById('mobileMenu');
+  function setMenu(open) {
+    mobileMenu.classList.toggle('hidden', !open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    menuBtn.setAttribute('aria-label', open ? 'Menü schliessen' : 'Menü öffnen');
+  }
+  menuBtn.addEventListener('click', function () { setMenu(mobileMenu.classList.contains('hidden')); });
+  mobileMenu.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
+
+  /* ---------- Scroll-Animationen ---------- */
+  var revealEls = document.querySelectorAll('[data-reveal]');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(function (el, i) { el.style.transitionDelay = (i % 3) * 70 + 'ms'; io.observe(el); });
+  } else { revealEls.forEach(function (el) { el.classList.add('in'); }); }
+
+  /* ---------- Hero-Checkliste ---------- */
+  document.querySelectorAll('.ing-btn').forEach(function (b) {
+    b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); });
+  });
+
+  /* ---------- FAQ ---------- */
+  document.querySelectorAll('.faq-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = btn.closest('.faq-item');
+      var open = !item.classList.contains('open');
+      item.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', String(open));
+    });
+  });
+
+  /* ---------- Rezepte ---------- */
+  var recipes = {
+    klassisch: {
+      title: 'Klassische Herzwaffeln', tag: 'Süss', time: '25 Min', level: 'Einfach', base: 4,
+      intro: 'Der Rührteig für jeden Tag. Er braucht nur eine Schüssel und gelingt auch ohne Erfahrung.',
+      ing: [
+        { n: 'Weizenmehl', a: 250, u: 'g' }, { n: 'Zucker', a: 60, u: 'g' }, { n: 'Backpulver', a: 1, u: 'TL' },
+        { n: 'Eier', n1: 'Ei', a: 3, c: true }, { n: 'Milch', a: 300, u: 'ml' }, { n: 'Butter, geschmolzen', a: 120, u: 'g' },
+        { n: 'Vanilleextrakt', a: 1, u: 'TL' }, { n: 'Salz', t: '1 Prise' }
+      ],
+      steps: [
+        'Mehl, Zucker, Backpulver und Salz in einer Schüssel mischen.',
+        'Eier, Milch, Butter und Vanille verrühren und zur Mehlmischung giessen. Nur so lange rühren, bis der Teig glatt ist.',
+        'Den Teig 10 Minuten quellen lassen.',
+        'Waffeleisen vorheizen und leicht einfetten. Pro Waffel eine kleine Kelle Teig einfüllen und 3 bis 4 Minuten goldgelb backen.',
+        'Auf einem Gitter auskühlen lassen und mit Puderzucker, Sahne und Beeren servieren.'
+      ],
+      tip: 'Ein Schuss Mineralwasser im Teig macht die Waffeln noch knuspriger.'
+    },
+    bruesseler: {
+      title: 'Brüsseler Hefewaffeln', tag: 'Süss', time: '50 Min', level: 'Mittel', base: 4,
+      intro: 'Hefeteig und steif geschlagenes Eiweiss machen diese Waffeln luftig. Perfekt für den Brunch.',
+      ing: [
+        { n: 'Weizenmehl', a: 300, u: 'g' }, { n: 'Trockenhefe', a: 7, u: 'g' }, { n: 'Zucker', a: 40, u: 'g' },
+        { n: 'Eier, getrennt', n1: 'Ei, getrennt', a: 3, c: true }, { n: 'Milch, lauwarm', a: 350, u: 'ml' }, { n: 'Butter, geschmolzen', a: 100, u: 'g' },
+        { n: 'Vanilleextrakt', a: 1, u: 'TL' }, { n: 'Salz', t: '1 Prise' }
+      ],
+      steps: [
+        'Mehl, Hefe, Zucker und Salz mischen. Eigelb, lauwarme Milch, Butter und Vanille einrühren.',
+        'Den Teig abgedeckt 45 Minuten an einem warmen Ort gehen lassen, bis er deutlich aufgeht.',
+        'Das Eiweiss mit einer Prise Salz steif schlagen und vorsichtig unter den Teig heben.',
+        'Im vorgeheizten, gefetteten Eisen etwa 4 Minuten backen.',
+        'Mit Puderzucker, Vanillecreme und Erdbeeren servieren.'
+      ],
+      tip: 'Den Eischnee nur unterheben, nicht rühren. Sonst geht die Luft verloren.'
+    },
+    luettich: {
+      title: 'Lütticher Waffeln', tag: 'Süss', time: '60 Min', level: 'Mittel', base: 4,
+      intro: 'Dichter Hefeteig mit Perlzucker. Der Zucker karamellisiert im Eisen und gibt den Waffeln ihre Kruste.',
+      ing: [
+        { n: 'Weizenmehl', a: 350, u: 'g' }, { n: 'Trockenhefe', a: 7, u: 'g' }, { n: 'Milch, lauwarm', a: 120, u: 'ml' },
+        { n: 'Eier', n1: 'Ei', a: 2, c: true }, { n: 'Butter, weich', a: 150, u: 'g' }, { n: 'Zucker', a: 30, u: 'g' },
+        { n: 'Perlzucker', a: 100, u: 'g' }, { n: 'Zimt', a: 1, u: 'TL' }, { n: 'Salz', t: '1 Prise' }
+      ],
+      steps: [
+        'Mehl, Hefe, Zucker, Zimt und Salz mischen. Milch und Eier zugeben und 5 Minuten kneten.',
+        'Die weiche Butter stückchenweise einkneten, bis ein glatter Teig entsteht.',
+        'Abgedeckt 45 Minuten gehen lassen.',
+        'Perlzucker unterkneten und den Teig in Portionen von etwa 80 g teilen.',
+        'Jede Portion 3 bis 4 Minuten im Eisen backen, bis der Zucker karamellisiert.'
+      ],
+      tip: 'Die Eisenränder nach dem Backen kurz abwischen, denn karamellisierter Zucker klebt.'
+    },
+    vegan: {
+      title: 'Vegane Beerenwaffeln', tag: 'Vegan', time: '25 Min', level: 'Einfach', base: 4,
+      intro: 'Ohne Ei und ohne Milch, mit knusprigen Rändern. Der Zitronensaft reagiert mit dem Backpulver und macht den Teig locker.',
+      ing: [
+        { n: 'Weizenmehl', a: 250, u: 'g' }, { n: 'Haferdrink', a: 400, u: 'ml' }, { n: 'Rapsöl', a: 60, u: 'ml' },
+        { n: 'Zucker', a: 50, u: 'g' }, { n: 'Backpulver', a: 2, u: 'TL' }, { n: 'Zitronensaft', a: 1, u: 'EL' },
+        { n: 'Vanilleextrakt', a: 1, u: 'TL' }, { n: 'Himbeeren zum Servieren', a: 150, u: 'g' }, { n: 'Salz', t: '1 Prise' }
+      ],
+      steps: [
+        'Mehl, Zucker, Backpulver und Salz mischen.',
+        'Haferdrink, Öl, Zitronensaft und Vanille verrühren und mit der Mehlmischung zu einem glatten Teig verrühren.',
+        'Den Teig 10 Minuten ruhen lassen.',
+        'Im vorgeheizten, gefetteten Eisen 4 bis 5 Minuten goldbraun backen.',
+        'Mit frischen oder aufgetauten Himbeeren und etwas Ahornsirup servieren.'
+      ],
+      tip: 'Wird der Teig beim Stehen dicker, rühre einen Schluck Haferdrink ein.'
+    },
+    herzhaft: {
+      title: 'Käse-Kräuter-Waffeln', tag: 'Herzhaft', time: '25 Min', level: 'Einfach', base: 4,
+      intro: 'Herzhaft statt süss. Mit Greyerzer und Schnittlauch eine schnelle Beilage zu Suppe oder Salat.',
+      ing: [
+        { n: 'Weizenmehl', a: 200, u: 'g' }, { n: 'Backpulver', a: 2, u: 'TL' }, { n: 'Eier', n1: 'Ei', a: 3, c: true },
+        { n: 'Milch', a: 200, u: 'ml' }, { n: 'Butter, geschmolzen', a: 60, u: 'g' }, { n: 'Greyerzer, gerieben', a: 120, u: 'g' },
+        { n: 'Schnittlauch, fein geschnitten', a: 3, u: 'EL' }, { n: 'Frischkäse zum Servieren', a: 100, u: 'g' },
+        { n: 'Salz', t: '½ TL' }, { n: 'Pfeffer', t: '1 Prise' }
+      ],
+      steps: [
+        'Mehl, Backpulver, Salz und Pfeffer mischen.',
+        'Eier, Milch und Butter verrühren, zum Mehl geben und glatt rühren.',
+        'Käse und Schnittlauch unterheben.',
+        'Im vorgeheizten, gefetteten Eisen 4 Minuten backen, bis der Käse goldbraun ist.',
+        'Warm mit Frischkäse und einem Salat servieren.'
+      ],
+      tip: 'Wer mag, ersetzt den Schnittlauch durch Petersilie oder Bärlauch.'
+    },
+    schoko: {
+      title: 'Schoko-Brownie-Waffeln', tag: 'Süss', time: '30 Min', level: 'Einfach', base: 4,
+      intro: 'Saftig, kakaotief und mit Schokoladenstückchen. Fast ein Dessert, nur knuspriger.',
+      ing: [
+        { n: 'Weizenmehl', a: 200, u: 'g' }, { n: 'Kakaopulver', a: 40, u: 'g' }, { n: 'Zucker', a: 80, u: 'g' },
+        { n: 'Backpulver', a: 1, u: 'TL' }, { n: 'Eier', n1: 'Ei', a: 2, c: true }, { n: 'Milch', a: 250, u: 'ml' },
+        { n: 'Butter, geschmolzen', a: 80, u: 'g' }, { n: 'Zartbitterschokolade, gehackt', a: 80, u: 'g' }, { n: 'Salz', t: '1 Prise' }
+      ],
+      steps: [
+        'Mehl, Kakao, Zucker, Backpulver und Salz mischen.',
+        'Eier, Milch und Butter verrühren und zur Mehlmischung geben. Glatt rühren.',
+        'Die gehackte Schokolade unterheben und den Teig 10 Minuten ruhen lassen.',
+        'Im vorgeheizten, gefetteten Eisen 4 bis 5 Minuten backen.',
+        'Mit Himbeeren, Mascarpone oder einer Kugel Vanilleeis servieren.'
+      ],
+      tip: 'Kakao verbrennt schneller. Stelle das Eisen eine Stufe niedriger ein.'
+    }
+  };
+
+  var fr = { 0.25: '¼', 0.5: '½', 0.75: '¾' };
+  function fmtNum(v) {
+    var w = Math.floor(v), f = Math.round((v - w) * 4) / 4;
+    if (f === 1) { w += 1; f = 0; }
+    return (w > 0 ? w : '') + (f ? (fr[f] || '') : '') || '¼';
+  }
+  function amount(i, s, base) {
+    if (i.t) return { a: i.t, n: i.n };
+    var v = i.a * s / base;
+    if (i.c) { v = Math.max(1, Math.round(v)); return { a: String(v), n: v === 1 && i.n1 ? i.n1 : i.n }; }
+    if (i.u === 'g' || i.u === 'ml') { v = Math.max(5, Math.round(v / 5) * 5); return { a: v + ' ' + i.u, n: i.n }; }
+    v = Math.max(0.25, Math.round(v * 4) / 4);
+    return { a: fmtNum(v) + ' ' + i.u, n: i.n };
+  }
+
+  var recipeDlg = document.getElementById('recipeDlg');
+  var recipePanel = document.getElementById('recipePanel');
+  var legalDlg = document.getElementById('legalDlg');
+  var legalPanel = document.getElementById('legalPanel');
+  var current = null, servings = 4, lastFocus = null;
+
+  var check = '<svg class="h-3 w-3 text-white opacity-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>';
+
+  function ingHtml() {
+    var r = recipes[current];
+    return r.ing.map(function (i) {
+      var x = amount(i, servings, r.base);
+      return '<li><button type="button" aria-pressed="false" class="ing-btn flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left hover:bg-blush-50">' +
+        '<span class="ing-box flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-blush-300 bg-white">' + check + '</span>' +
+        '<span class="ing-text"><b>' + x.a + '</b> ' + x.n + '</span></button></li>';
+    }).join('');
+  }
+  function bindIng(root) {
+    root.querySelectorAll('.ing-btn').forEach(function (b) {
+      b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); });
+    });
+  }
+
+  function renderRecipe() {
+    var r = recipes[current];
+    recipePanel.innerHTML =
+      '<div class="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-blush-200/70 bg-white/95 px-6 py-5 backdrop-blur sm:px-8">' +
+        '<div><span class="inline-block rounded-full bg-blush-100 px-3 py-1 text-xs font-bold text-blush-700">' + r.tag + '</span>' +
+        '<h2 id="rTitle" class="mt-2 font-serif text-3xl font-semibold leading-tight">' + r.title + '</h2></div>' +
+        '<button type="button" id="rClose" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-blush-200 hover:bg-blush-50" aria-label="Rezept schliessen">' +
+        '<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
+      '<div class="px-6 pb-8 pt-6 sm:px-8">' +
+        '<p class="leading-relaxed text-plum-700">' + r.intro + '</p>' +
+        '<div class="mt-4 flex flex-wrap gap-2 text-xs font-bold text-plum-700"><span class="rounded-full bg-blush-100 px-3 py-1.5">' + r.time + '</span><span class="rounded-full bg-blush-100 px-3 py-1.5">' + r.level + '</span></div>' +
+        '<div class="mt-7 flex items-center justify-between gap-4 rounded-2xl bg-blush-50 px-4 py-3">' +
+          '<span class="text-sm font-bold">Portionen</span>' +
+          '<div class="flex items-center gap-3">' +
+            '<button type="button" id="sMinus" class="flex h-10 w-10 items-center justify-center rounded-full border border-blush-300 bg-white text-xl font-bold hover:bg-blush-100" aria-label="Eine Portion weniger">&minus;</button>' +
+            '<span id="sVal" class="w-6 text-center text-lg font-bold" aria-live="polite">' + servings + '</span>' +
+            '<button type="button" id="sPlus" class="flex h-10 w-10 items-center justify-center rounded-full border border-blush-300 bg-white text-xl font-bold hover:bg-blush-100" aria-label="Eine Portion mehr">+</button>' +
+          '</div></div>' +
+        '<h3 class="mt-8 font-serif text-2xl font-semibold">Zutaten</h3>' +
+        '<ul id="ingList" class="mt-3 divide-y divide-blush-100">' + ingHtml() + '</ul>' +
+        '<h3 class="mt-8 font-serif text-2xl font-semibold">Zubereitung</h3>' +
+        '<ol class="mt-4 space-y-4">' + r.steps.map(function (s, i) {
+          return '<li class="flex gap-4"><span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blush-600 text-sm font-bold text-white">' + (i + 1) + '</span><p class="pt-1 leading-relaxed text-plum-800">' + s + '</p></li>';
+        }).join('') + '</ol>' +
+        '<div class="mt-8 rounded-2xl border border-lilac-200 bg-lilac-50 p-5"><p class="text-sm font-bold text-lilac-600">Tipp</p><p class="mt-1 leading-relaxed text-plum-800">' + r.tip + '</p></div>' +
+      '</div>';
+    bindIng(recipePanel);
+    document.getElementById('rClose').addEventListener('click', function () { recipeDlg.close(); });
+    document.getElementById('sMinus').addEventListener('click', function () { changeServ(-1); });
+    document.getElementById('sPlus').addEventListener('click', function () { changeServ(1); });
+  }
+  function changeServ(d) {
+    servings = Math.min(12, Math.max(1, servings + d));
+    document.getElementById('sVal').textContent = servings;
+    document.getElementById('ingList').innerHTML = ingHtml();
+    bindIng(document.getElementById('ingList'));
+  }
+
+  function lockScroll(on) { document.documentElement.style.overflow = on ? 'hidden' : ''; }
+
+  function openRecipe(id) {
+    if (!recipes[id]) return;
+    current = id; servings = recipes[id].base; lastFocus = document.activeElement;
+    renderRecipe(); recipePanel.scrollTop = 0;
+    if (typeof recipeDlg.showModal === 'function') { recipeDlg.showModal(); lockScroll(true); }
+  }
+  document.querySelectorAll('[data-open-recipe]').forEach(function (b) {
+    b.addEventListener('click', function () { openRecipe(b.getAttribute('data-open-recipe')); });
+  });
+
+  /* ---------- Impressum und Datenschutz ---------- */
+  var legal = {
+    impressum: {
+      title: 'Impressum',
+      body: '<p><b>Waffelwölkchen</b><br>Lindenweg 12<br>3011 Bern<br>Schweiz</p>' +
+        '<p class="mt-4"><b>Kontakt</b><br>hallo@waffelwoelkchen.ch</p>' +
+        '<p class="mt-4"><b>Inhalt</b><br>Die Rezepte und Tipps auf dieser Seite wurden sorgfältig erstellt und getestet. Für Allergien und Unverträglichkeiten prüfe bitte immer die Zutatenlisten der verwendeten Produkte.</p>' +
+        '<p class="mt-4"><b>Urheberrecht</b><br>Texte, Gestaltung und Illustrationen sind urheberrechtlich geschützt.</p>'
+    },
+    datenschutz: {
+      title: 'Datenschutz',
+      body: '<p><b>Verantwortlich</b><br>Waffelwölkchen, Lindenweg 12, 3011 Bern, hallo@waffelwoelkchen.ch</p>' +
+        '<p class="mt-4"><b>Kontaktformular</b><br>Die Angaben im Formular (Name, E-Mail, Thema, Nachricht) verwenden wir nur, um deine Anfrage zu beantworten oder dir den Newsletter zu senden. Du kannst dich jederzeit wieder abmelden und die Löschung deiner Daten verlangen.</p>' +
+        '<p class="mt-4"><b>Externe Dienste</b><br>Diese Seite lädt Schriften von Google Fonts sowie Gestaltungs- und Icon-Bibliotheken von Content-Delivery-Netzwerken. Dabei wird deine IP-Adresse an die jeweiligen Anbieter übermittelt.</p>' +
+        '<p class="mt-4"><b>Cookies</b><br>Wir setzen keine Tracking-Cookies und verwenden keine Analyse-Werkzeuge.</p>'
+    }
+  };
+  function openLegal(k) {
+    var d = legal[k]; if (!d) return;
+    lastFocus = document.activeElement;
+    legalPanel.innerHTML =
+      '<div class="flex items-start justify-between gap-4"><h2 id="lTitle" class="font-serif text-3xl font-semibold">' + d.title + '</h2>' +
+      '<button type="button" id="lClose" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-blush-200 hover:bg-blush-50" aria-label="Schliessen"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
+      '<div class="mt-5 leading-relaxed text-plum-700">' + d.body + '</div>';
+    document.getElementById('lClose').addEventListener('click', function () { legalDlg.close(); });
+    legalDlg.showModal(); lockScroll(true);
+  }
+  document.querySelectorAll('[data-open-legal]').forEach(function (b) {
+    b.addEventListener('click', function () { openLegal(b.getAttribute('data-open-legal')); });
+  });
+
+  [recipeDlg, legalDlg].forEach(function (dlg) {
+    dlg.addEventListener('click', function (e) { if (e.target.hasAttribute('data-backdrop') || e.target === dlg) dlg.close(); });
+    dlg.addEventListener('close', function () {
+      if (!recipeDlg.open && !legalDlg.open) lockScroll(false);
+      if (lastFocus && lastFocus.focus) { try { lastFocus.focus(); } catch (e) {} }
+    });
+  });
+
+  /* ---------- Kontaktformular ---------- */
+  var form = document.getElementById('contactForm');
+  var ok = document.getElementById('formOk');
+  var f = {
+    name: document.getElementById('cName'), mail: document.getElementById('cMail'),
+    topic: document.getElementById('cTopic'), consent: document.getElementById('cConsent')
+  };
+  var errEl = { name: 'eName', mail: 'eMail', topic: 'eTopic', consent: 'eConsent' };
+  function setErr(k, msg) {
+    var p = document.getElementById(errEl[k]);
+    p.textContent = msg || ''; p.classList.toggle('hidden', !msg);
+    f[k].setAttribute('aria-invalid', msg ? 'true' : 'false');
+    if (k !== 'consent') f[k].classList.toggle('border-blush-600', !!msg);
+  }
+  var rules = {
+    name: function () { return f.name.value.trim().length >= 2 ? '' : 'Bitte gib deinen Namen an.'; },
+    mail: function () { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.mail.value.trim()) ? '' : 'Bitte gib eine gültige E-Mail-Adresse an.'; },
+    topic: function () { return f.topic.value ? '' : 'Bitte wähle ein Thema.'; },
+    consent: function () { return f.consent.checked ? '' : 'Bitte bestätige die Datenschutzerklärung.'; }
+  };
+  Object.keys(f).forEach(function (k) {
+    var ev = (k === 'topic' || k === 'consent') ? 'change' : 'blur';
+    f[k].addEventListener(ev, function () { setErr(k, rules[k]()); });
+    f[k].addEventListener('input', function () { if (f[k].getAttribute('aria-invalid') === 'true') setErr(k, rules[k]()); });
+  });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var first = null;
+    Object.keys(rules).forEach(function (k) { var m = rules[k](); setErr(k, m); if (m && !first) first = f[k]; });
+    if (first) { first.focus(); return; }
+    document.getElementById('okTitle').textContent = 'Danke, ' + f.name.value.trim().split(' ')[0] + '!';
+    form.classList.add('hidden'); ok.classList.remove('hidden'); icons();
+  });
+  document.getElementById('formReset').addEventListener('click', function () {
+    form.reset(); Object.keys(f).forEach(function (k) { setErr(k, ''); });
+    ok.classList.add('hidden'); form.classList.remove('hidden');
+  });
+})();
+</script>
+</body>
+</html>
